@@ -7,15 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		32158D821E2CAC5F00EE0CDD /* PrivatePhotoListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 32158D811E2CAC5F00EE0CDD /* PrivatePhotoListVC.m */; };
 		32F29BAC1E0CC53200290A1E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BAB1E0CC53200290A1E /* main.m */; };
 		32F29BAF1E0CC53200290A1E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BAE1E0CC53200290A1E /* AppDelegate.m */; };
 		32F29BB21E0CC53200290A1E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BB11E0CC53200290A1E /* ViewController.m */; };
 		32F29BB51E0CC53200290A1E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 32F29BB31E0CC53200290A1E /* Main.storyboard */; };
 		32F29BB71E0CC53200290A1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32F29BB61E0CC53200290A1E /* Assets.xcassets */; };
 		32F29BBA1E0CC53200290A1E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 32F29BB81E0CC53200290A1E /* LaunchScreen.storyboard */; };
+		32F819B01E1E492C0089DEE3 /* SinglePhotoVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F819AF1E1E492C0089DEE3 /* SinglePhotoVC.m */; };
+		32FBBBAF1E1CDFDA00A4D6DC /* PhotoListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 32FBBBAE1E1CDFDA00A4D6DC /* PhotoListVC.m */; };
+		32FBBBB21E1CE38500A4D6DC /* PhotoDetailTabCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 32FBBBB11E1CE38500A4D6DC /* PhotoDetailTabCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		32158D801E2CAC5F00EE0CDD /* PrivatePhotoListVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrivatePhotoListVC.h; sourceTree = "<group>"; };
+		32158D811E2CAC5F00EE0CDD /* PrivatePhotoListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivatePhotoListVC.m; sourceTree = "<group>"; };
 		32F29BA71E0CC53200290A1E /* PhotoKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		32F29BAB1E0CC53200290A1E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32F29BAD1E0CC53200290A1E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -26,6 +32,12 @@
 		32F29BB61E0CC53200290A1E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		32F29BB91E0CC53200290A1E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		32F29BBB1E0CC53200290A1E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		32F819AE1E1E492C0089DEE3 /* SinglePhotoVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SinglePhotoVC.h; sourceTree = "<group>"; };
+		32F819AF1E1E492C0089DEE3 /* SinglePhotoVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SinglePhotoVC.m; sourceTree = "<group>"; };
+		32FBBBAD1E1CDFDA00A4D6DC /* PhotoListVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoListVC.h; sourceTree = "<group>"; };
+		32FBBBAE1E1CDFDA00A4D6DC /* PhotoListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoListVC.m; sourceTree = "<group>"; };
+		32FBBBB01E1CE38500A4D6DC /* PhotoDetailTabCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoDetailTabCell.h; sourceTree = "<group>"; };
+		32FBBBB11E1CE38500A4D6DC /* PhotoDetailTabCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoDetailTabCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +74,7 @@
 				32F29BAE1E0CC53200290A1E /* AppDelegate.m */,
 				32F29BB01E0CC53200290A1E /* ViewController.h */,
 				32F29BB11E0CC53200290A1E /* ViewController.m */,
+				32FBBBB31E1CE63700A4D6DC /* Cell */,
 				32F29BB31E0CC53200290A1E /* Main.storyboard */,
 				32F29BB61E0CC53200290A1E /* Assets.xcassets */,
 				32F29BB81E0CC53200290A1E /* LaunchScreen.storyboard */,
@@ -77,6 +90,21 @@
 				32F29BAB1E0CC53200290A1E /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		32FBBBB31E1CE63700A4D6DC /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				32FBBBAD1E1CDFDA00A4D6DC /* PhotoListVC.h */,
+				32FBBBAE1E1CDFDA00A4D6DC /* PhotoListVC.m */,
+				32158D801E2CAC5F00EE0CDD /* PrivatePhotoListVC.h */,
+				32158D811E2CAC5F00EE0CDD /* PrivatePhotoListVC.m */,
+				32FBBBB01E1CE38500A4D6DC /* PhotoDetailTabCell.h */,
+				32FBBBB11E1CE38500A4D6DC /* PhotoDetailTabCell.m */,
+				32F819AE1E1E492C0089DEE3 /* SinglePhotoVC.h */,
+				32F819AF1E1E492C0089DEE3 /* SinglePhotoVC.m */,
+			);
+			name = Cell;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -152,8 +180,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				32F29BB21E0CC53200290A1E /* ViewController.m in Sources */,
+				32F819B01E1E492C0089DEE3 /* SinglePhotoVC.m in Sources */,
+				32158D821E2CAC5F00EE0CDD /* PrivatePhotoListVC.m in Sources */,
 				32F29BAF1E0CC53200290A1E /* AppDelegate.m in Sources */,
+				32FBBBB21E1CE38500A4D6DC /* PhotoDetailTabCell.m in Sources */,
 				32F29BAC1E0CC53200290A1E /* main.m in Sources */,
+				32FBBBAF1E1CDFDA00A4D6DC /* PhotoListVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
