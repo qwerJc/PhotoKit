@@ -10,7 +10,8 @@
 #import "SinglePhotoVC.h"
 #import "PhotoListVC.h"
 
-@interface PhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource>
+
+@interface PhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 {
     CGRect rect;
     PHAsset *asset;                         //照片库中的一个资源
@@ -18,14 +19,12 @@
     UITableView *tableViewPhoto;
     
     UIImageView *img1;
+
 }
-@property(strong,nonatomic)SinglePhotoVC *sPhotoVC;
 @property(strong,nonatomic)PHCachingImageManager *imageManager;
 @property(strong,nonatomic)PHFetchResult *assetsFetchResults;
 @property(strong,nonatomic)PHFetchOptions *options;
-@property(assign,nonatomic)id blockLID;
-@property(assign,nonatomic)id blockMID;
-@property(assign,nonatomic)id blockRID;
+@property(strong,nonatomic)UIImagePickerController *imgPicker;
 
 
 
@@ -66,9 +65,13 @@
     tableViewPhoto.delegate = self;
     tableViewPhoto.separatorStyle = UITableViewCellSeparatorStyleNone;
     [self.view addSubview:tableViewPhoto];
+    
+    //监听拍照事件
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraNotification:) name:AVCaptureSessionDidStartRunningNotification object:nil];
 }
 -(void)updateFetchRes:(PHAssetCollection *)assetCollection{
     _assetsFetchResults=[PHAsset fetchAssetsInAssetCollection:assetCollection options:_options];
+
     [tableViewPhoto reloadData];
 }
 -(void)updateFetchRes{
@@ -76,15 +79,106 @@
     [tableViewPhoto reloadData];
 }
 -(void)btnCameraClick{
-    NSLog(@"Print path!");
+    _imgPicker=[[UIImagePickerController alloc] init];
+    
+    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
+        _imgPicker.sourceType=UIImagePickerControllerSourceTypeCamera;
+        _imgPicker.delegate=self;
+        _imgPicker.allowsEditing = NO;
+        _imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        _imgPicker.showsCameraControls = NO;//不使用系统默认拍照按钮
+        
+        UIToolbar* tool = [[UIToolbar alloc]initWithFrame:CGRectMake(0, self.view.frame.size.height-75, self.view.frame.size.width, 75)];
+        tool.barStyle = UIBarStyleBlackTranslucent;
+        
+        //创建灵活调节按钮单元,设置间隔
+        UIBarButtonItem *flexibleitem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:(UIBarButtonSystemItemFlexibleSpace) target:self action:nil];
+        UIBarButtonItem* cancel = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(btnCancelCamera)];
+        UIBarButtonItem* add = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(btnTakePhoto)];
+        UIBarButtonItem* change = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:nil];
+        [tool setItems:[NSArray arrayWithObjects:cancel,flexibleitem,add,flexibleitem,change, nil]];
+        //把自定义的view设置到imagepickercontroller的overlay属性中
+        _imgPicker.cameraOverlayView = tool;
+        
+        
+        [self presentViewController:_imgPicker animated:NO completion:nil];
+    }else{
+        NSLog(@"不支持手机");
+    }
+
 }
--(void)showPhoto:(UIImage*)p{
-    if(p==nil){
+- (void)btnTakePhoto{
+    [_imgPicker takePicture];         //确认拍照
+    _imgPicker.sourceType =    UIImagePickerControllerSourceTypeCamera;
+}
+- (void)btnCancelCamera{
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
+    [tableViewPhoto reloadData];
+}
+//拍照后跳转到下面 imagePickerController
+-(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
+    UIImage *image = info[UIImagePickerControllerOriginalImage];
+    
+//    UIImageWriteToSavedPhotosAlbum(image, self, nil, (__bridge void *)self);
+    NSError *error = nil;
+    __block NSString *createdAssetID = nil;
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        //----block 执行的时候还没有保存成功--获取占位图片的 id，通过 id 获取图片---同步
+        createdAssetID = [PHAssetChangeRequest             creationRequestForAssetFromImage:image].placeholderForCreatedAsset.localIdentifier;
+    } error:&error];
+    
+
+    PHFetchResult<PHAsset *> *assets = [PHAsset fetchAssetsWithLocalIdentifiers:@[createdAssetID] options:nil];
+    if(_nowAssetCollection!=nil){
+        [self savePhoToSelfAlbum:assets];
+    }
+}
+-(void)savePhoToSelfAlbum:(PHFetchResult<PHAsset *> *)temAsset{
+    NSLog(@"collection name : %@",_nowAssetCollection.localizedTitle);
+    NSError *error = nil;
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        //--告诉系统，要操作哪个相册
+        PHAssetCollectionChangeRequest *collectionChangeRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:_nowAssetCollection];
+        //--添加图片到自定义相册--追加--就不能成为封面了
+        //--[collectionChangeRequest addAssets:assets];
+        //--插入图片到自定义相册--插入--可以成为封面
+        [collectionChangeRequest insertAssets:temAsset atIndexes:[NSIndexSet indexSetWithIndex:0]];
+    } error:&error];
+}
+//监听拍照通知（设置界面为全屏）
+- (void)cameraNotification:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // 这里实现
+        CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+        float aspectRatio = 4.0/3.0;
+        float scale = screenSize.height/screenSize.width * aspectRatio;
+        _imgPicker.cameraViewTransform = CGAffineTransformMakeScale(scale, scale);
+        
+    });
+}
+
+-(void)showPhoto:(NSInteger)order{
+    if(order<0){
         return;
     }
-    _sPhotoVC=[[SinglePhotoVC alloc] init];
-    [self.navigationController pushViewController:_sPhotoVC animated:YES];
-    [_sPhotoVC calSize:p];
+
+    PHImageRequestOptions *tryOp=[[PHImageRequestOptions alloc] init];
+    tryOp.deliveryMode=PHImageRequestOptionsDeliveryModeFastFormat;
+    tryOp.resizeMode=PHImageRequestOptionsResizeModeFast;
+    
+    SinglePhotoVC *sPhotoVC=[[SinglePhotoVC alloc] init];
+    [self.navigationController pushViewController:sPhotoVC animated:YES];
+    
+    asset = _assetsFetchResults[order];
+    
+    [_imageManager requestImageForAsset:asset
+                             targetSize:PHImageManagerMaximumSize
+                            contentMode:PHImageContentModeAspectFill
+                                options:tryOp
+                          resultHandler:^(UIImage *result, NSDictionary *info) {
+                              [sPhotoVC calSize:result];
+                          }];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -142,53 +236,53 @@
     tryOp.deliveryMode=PHImageRequestOptionsDeliveryModeHighQualityFormat;
     tryOp.resizeMode=PHImageRequestOptionsResizeModeExact;
     
-
-    [cell setPhoto1:nil andOriginImage:nil];
-    [cell setPhoto2:nil andOriginImage:nil];
-    [cell setPhoto2:nil andOriginImage:nil];
+    [cell setIntOriImageLeft:-1];
+    [cell setIntOriImageMid:-1];
+    [cell setIntOriImageRight:-1];
     
-    if(indexPath.row*3>=_assetsFetchResults.count)
+    [cell setMiniImageLeft:nil];
+    [cell setMiniImageMid:nil];
+    [cell setMiniImageRight:nil];
+    
+    if(indexPath.row*3<_assetsFetchResults.count)
     {
-        [cell setPhoto1:nil andOriginImage:nil];
-    }else{
         asset = _assetsFetchResults[indexPath.row*3];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-                                        [cell setPhoto1:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];    // 得到一张 UIImage，展示到界面上
+                                        [cell setMiniImageLeft:result];
                                     }];
+        [cell setIntOriImageLeft:indexPath.row*3];
+        
     }
 
-    if(indexPath.row*3+1>=_assetsFetchResults.count)
+    if(indexPath.row*3+1<_assetsFetchResults.count)
     {
-        [cell setPhoto2:nil andOriginImage:nil];
-    }else{
         asset = _assetsFetchResults[indexPath.row*3+1];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-                                    
-                                    [cell setPhoto2:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];
+                                        [cell setMiniImageMid:result];
                                 }];
+        [cell setIntOriImageMid:indexPath.row*3+1];
     }
     
-    if(indexPath.row*3+2>=_assetsFetchResults.count)
+    if(indexPath.row*3+2<_assetsFetchResults.count)
     {
-        [cell setPhoto3:nil andOriginImage:nil];
-    }else{
         asset = _assetsFetchResults[indexPath.row*3+2];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-
-                                    [cell setPhoto3:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];
+                                        [cell setMiniImageRight:result];
                                 }];
+        [cell setIntOriImageRight:indexPath.row*3+2];
+        
     }
     
 }

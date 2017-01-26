@@ -17,7 +17,6 @@
 @property(strong,nonatomic)NSString* nameOfAlbum;
 @property(strong,nonatomic)NSArray* arrayOfAlbum;
 @property(strong,nonatomic)UITableView* tableview;
-@property(strong,nonatomic)SinglePhotoVC *sPhotoVC;
 @property(strong,nonatomic)NSString* photoPath;
 @property(strong,nonatomic)NSString* fullPath;
 @property(strong,nonatomic)UIImagePickerController *imgPicker;
@@ -208,10 +207,18 @@
     return img;
 }
 
--(void)showPhoto:(UIImage*)p{
-    _sPhotoVC=[[SinglePhotoVC alloc] init];
-    [self.navigationController pushViewController:_sPhotoVC animated:YES];
-    [_sPhotoVC calSize:p];
+-(void)showPhoto:(NSInteger)order{
+    if(order<0){
+        return;
+    }
+    
+    SinglePhotoVC *sPhotoVC=[[SinglePhotoVC alloc] init];
+    [self.navigationController pushViewController:sPhotoVC animated:YES];
+    
+    _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:order]];
+    _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
+    UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
+    [sPhotoVC calSize:temImage];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -261,44 +268,40 @@
 }
 -(void)addPhoto:(PhotoDetailTabCell *)cell andIndxPath:(NSIndexPath *)indexPath{
     
-    [cell setPhoto1:nil andOriginImage:nil];
-    [cell setPhoto2:nil andOriginImage:nil];
-    [cell setPhoto3:nil andOriginImage:nil];
+    [cell setIntOriImageLeft:-1];
+    [cell setIntOriImageMid:-1];
+    [cell setIntOriImageRight:-1];
     
+    [cell setMiniImageLeft:nil];
+    [cell setMiniImageMid:nil];
+    [cell setMiniImageRight:nil];
     
-    if(indexPath.row*3>=_arrayOfAlbum.count)
-    {
-        [cell setPhoto1:nil andOriginImage:nil];
-    }else{
+    if(indexPath.row*3<_arrayOfAlbum.count){
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:indexPath.row*3]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
         
-        [cell setPhoto1:[self getThumbnail:temImage targetSize:CGSizeMake(10, 10)] andOriginImage:temImage];
+        [cell setMiniImageLeft:[self getThumbnail:temImage targetSize:CGSizeMake(8, 10)]];
+        [cell setIntOriImageLeft:indexPath.row*3];
     }
     
-    if(indexPath.row*3+1>=_arrayOfAlbum.count)
+    if(indexPath.row*3+1<_arrayOfAlbum.count)
     {
-        [cell setPhoto1:nil andOriginImage:nil];
-    }else{
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:(indexPath.row*3+1)]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
-        [cell setPhoto2:[self getThumbnail:temImage targetSize:CGSizeMake(10, 10)] andOriginImage:temImage];
-
+        [cell setMiniImageMid:[self getThumbnail:temImage targetSize:CGSizeMake(8, 10)]];
+        [cell setIntOriImageMid:indexPath.row*3+1];
     }
     
-    if(indexPath.row*3+2>=_arrayOfAlbum.count)
+    if(indexPath.row*3+2<_arrayOfAlbum.count)
     {
-        [cell setPhoto3:nil andOriginImage:nil];
-    }else{
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:(indexPath.row*3+2)]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
-        [cell setPhoto3:[self getThumbnail:temImage targetSize:CGSizeMake(10, 10)] andOriginImage:temImage];
-
+        [cell setMiniImageRight:[self getThumbnail:temImage targetSize:CGSizeMake(8, 10)]];
+        [cell setIntOriImageRight:indexPath.row*3+2];
     }
-    
 }
 
 -(UIImage *)getThumbnail:(UIImage *)sourceImage targetSize:(CGSize)size{

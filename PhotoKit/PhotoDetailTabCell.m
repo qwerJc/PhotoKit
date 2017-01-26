@@ -56,20 +56,23 @@
     return self;
 }
 -(void)setPhoto1:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage{
-    imgVPhoto1.image=thumbnail;
-    _oriImageLeft=oriImage;
-    
-    NSData *data1thum = UIImageJPEGRepresentation(thumbnail, 1.0);
-    NSData *data1ori = UIImageJPEGRepresentation(oriImage, 1.0);
-    NSLog(@"data1: ori:%lu and thum:%lu",(unsigned long)data1ori.length,(unsigned long)data1thum.length);
+//    _miniImageLefttt=oriImage;
+
 }
 -(void)setPhoto2:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage{
     imgVPhoto2.image=thumbnail;
-    _oriImageMid=oriImage;
 }
 -(void)setPhoto3:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage{
-    imgVPhoto3.image=thumbnail;
-    _oriImageRight=oriImage;
+
+}
+-(void)setMiniImageLeft:(UIImage *)miniImageLeft{
+    imgVPhoto1.image=miniImageLeft;
+}
+-(void)setMiniImageMid:(UIImage *)miniImageMid{
+    imgVPhoto2.image=miniImageMid;
+}
+-(void)setMiniImageRight:(UIImage *)miniImageRight{
+    imgVPhoto3.image=miniImageRight;
 }
 -(void)singleTapAction:(UIGestureRecognizer *)gest
 {
@@ -77,19 +80,19 @@
         case 1:
             NSLog(@"点了图片1");
             if([_delegate respondsToSelector:@selector(showPhoto:)]){
-                [_delegate showPhoto:_oriImageLeft];
+                [_delegate showPhoto:_intOriImageLeft];
             }
             break;
         case 2:
             NSLog(@"点了图片2");
             if([_delegate respondsToSelector:@selector(showPhoto:)]){
-                [_delegate showPhoto:_oriImageMid];
+                [_delegate showPhoto:_intOriImageMid];
             }
             break;
         case 3:
             NSLog(@"点了图片3");
             if([_delegate respondsToSelector:@selector(showPhoto:)]){
-                [_delegate showPhoto:_oriImageRight];
+                [_delegate showPhoto:_intOriImageRight];
             }
             break;
         default:

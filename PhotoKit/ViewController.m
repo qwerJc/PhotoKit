@@ -5,13 +5,13 @@
 //  Created by 贾辰 on 16/12/23.
 //  Copyright © 2016年 贾辰. All rights reserved.
 //
-//  改进1:能不能把低质量的换为缩略图，高质量的换为高清图
+//  改进1:私密相册图片质量，流畅度(block)
 //  改进2:首页改为半模态视图&
         //    NSIndexPath *start = [NSIndexPath indexPathForRow:0 inSection:0];
         //    [self tableView:tableView didSelectRowAtIndexPath:start];
-//  改进3：目前创建完相册cell并不能刷新，要重进才可以
+//  qbimagepicker 批量管理照片
 
-//  进度：准备添加：新建私密相册的功能（弹出半模态视图），以及每个相册加个照相按钮（先显示该相册路径）
+//  进度：准备添加：新建私密相册的功能（弹出半模态视图）
 
 #import "ViewController.h"
 #import "PhotoListVC.h"
@@ -167,6 +167,7 @@
             NSLog(@"选择的是：相机胶卷");
             [_vcPhotoList updateFetchRes];
             [self.navigationController pushViewController:_vcPhotoList animated:YES];
+            [_vcPhotoList setNowAssetCollection:nil];
             break;
         case 1:
             temCount=0;
@@ -175,6 +176,7 @@
                 {
                     NSLog(@"选择的是: %@",assetCollection.localizedTitle);
                     [_vcPhotoList updateFetchRes:assetCollection];
+                    [_vcPhotoList setNowAssetCollection:assetCollection];
                 }
                 temCount++;
             }

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 @protocol CellPhoto <NSObject>
 
--(void)showPhoto:(UIImage*)p;
+-(void)showPhoto:(NSInteger)order;
 
 @end
 
@@ -23,11 +23,13 @@
     UIControl *conV2;
     UIControl *conV3;
 }
-@property(strong,nonatomic)UIImage *oriImageLeft;
-@property(strong,nonatomic)UIImage *oriImageMid;
-@property(strong,nonatomic)UIImage *oriImageRight;
--(void)setPhoto1:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage;
--(void)setPhoto2:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage;
--(void)setPhoto3:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage;
+@property(assign,nonatomic)NSInteger intOriImageLeft;
+@property(assign,nonatomic)NSInteger intOriImageRight;
+@property(assign,nonatomic)NSInteger intOriImageMid;
+
+@property(strong,nonatomic)UIImage *miniImageLeft;
+@property(strong,nonatomic)UIImage *miniImageMid;
+@property(strong,nonatomic)UIImage *miniImageRight;
+
 @property(weak,nonatomic)id<CellPhoto> delegate;
 @end
