@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+@protocol PrivatePhotoViewCollector <NSObject>
+-(void)reFreshPrivateTableView;
+@end
 
 @interface PrivatePhotoListVC : UIViewController
+
 -(void)receiveAlbumName:(NSString*)name andArray:(NSArray*)priAlbum;
+
+@property(weak,nonatomic)id<PrivatePhotoViewCollector> delegate;
+
 @end

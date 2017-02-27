@@ -5,20 +5,22 @@
 //  Created by 贾辰 on 16/12/23.
 //  Copyright © 2016年 贾辰. All rights reserved.
 //
-//  改进1:私密相册图片质量，流畅度(block)
+//  改进1:私密相册图片质量:存储的为压缩后的，，130行和289行，应该存两套
 //  改进2:首页改为半模态视图&
         //    NSIndexPath *start = [NSIndexPath indexPathForRow:0 inSection:0];
         //    [self tableView:tableView didSelectRowAtIndexPath:start];
 //  qbimagepicker 批量管理照片
+//  改3 : 设置sel状态时，不刷新cell
 
-//  进度：准备添加：新建私密相册的功能（弹出半模态视图）
+//  php相册路径 ：／home／wwwroot／default
+//  删除相册 rm －r 私1
 
 #import "ViewController.h"
 #import "PhotoListVC.h"
 #import "PrivatePhotoListVC.h"
 #include <Photos/Photos.h>
 
-@interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
+@interface ViewController ()<PrivatePhotoViewCollector,PublicPhotoViewCollector,UITableViewDelegate,UITableViewDataSource>
 
 @property(strong,nonatomic)UIViewController *vcPhotoDetail;
 @property(strong,nonatomic)PHFetchResult *selfDefineAssets;
@@ -30,6 +32,9 @@
 @property(strong,nonatomic)NSArray *docList;
 @property(strong,nonatomic)NSArray *privatePhoList;
 
+@property(assign,nonatomic)NSInteger lastIndexPathRow;
+@property(assign,nonatomic)NSInteger lastIndexPathSection;
+
 @end
 
 @implementation ViewController
@@ -40,7 +45,8 @@
     
     _vcPhotoList=[[PhotoListVC alloc] init];
     _vcPriPhotoList=[[PrivatePhotoListVC alloc] init];
-    
+    _vcPhotoList.delegate=self;
+    _vcPriPhotoList.delegate=self;
     
     //自定义相册
     _selfDefineAssets = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
@@ -69,10 +75,93 @@
     [btnCreSelfAlbum setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [btnCreSelfAlbum setBackgroundColor:[UIColor orangeColor]];
     [self.view addSubview:btnCreSelfAlbum];
+    
+    UIButton *tem = [[UIButton alloc] initWithFrame:CGRectMake(180, btnCreSelfAlbum.frame.origin.y+80, 120, 50)];
+    [tem addTarget:self action:@selector(btnTem) forControlEvents:UIControlEventTouchUpInside];
+    [tem setTitle:@"tem" forState:UIControlStateNormal];
+    [tem setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [tem setBackgroundColor:[UIColor orangeColor]];
+    [self.view addSubview:tem];
+    
+}
+#pragma mark - tableView
+//添加编辑模式
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section==0) {
+        return NO;
+    }else{
+    return YES;
+    }
+}
+
+//左滑动出现的文字
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return @"删除";
+}
+
+//删除所做的动作
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSLog(@"%d,%d",indexPath.section,indexPath.row);
+    
+    if (indexPath.section==1) {
+        int temCount=0;
+        for (PHAssetCollection *assetCollection in _selfDefineAssets) {
+            if(temCount==indexPath.row)
+            {
+                
+                NSArray *delAssetCollection=[[NSArray alloc] initWithObjects:assetCollection, nil];
+                [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                    [PHAssetCollectionChangeRequest deleteAssetCollections:delAssetCollection];
+                } completionHandler:^(BOOL success, NSError *error) {
+                        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"删除成功"
+                                                                                                 message:nil
+                                                                                          preferredStyle:UIAlertControllerStyleAlert];
+                        UIAlertAction *OKAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+                            [self reloadAlbumInfo];
+                        }];
+                        
+                        [alertController addAction:OKAction];
+
+                        [self presentViewController:alertController animated:YES completion:nil];
+                    
+                    
+                }];
+                return;
+            }
+            temCount++;
+        }
+
+    }else{
+        NSString *str=[_docList objectAtIndex:indexPath.row];
+        
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        NSString *pathDocuments = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        NSString *createPath = [NSString stringWithFormat:@"%@/%@", pathDocuments,str];
+        
+        NSLog(@"%@",createPath);
+        
+        [fileManager removeItemAtPath:createPath error:nil];
+        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"删除成功"
+                                                                                 message:nil
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *OKAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+            _docList= [[NSFileManager defaultManager] contentsOfDirectoryAtPath:_pathDocuments error:nil];
+            [_tableView reloadData];
+        }];
+        
+        [alertController addAction:OKAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+        
+    }
+    
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {   //每个节点有几行
-    
     switch (section) {
         case 0:
             return 1;
@@ -168,6 +257,8 @@
             [_vcPhotoList updateFetchRes];
             [self.navigationController pushViewController:_vcPhotoList animated:YES];
             [_vcPhotoList setNowAssetCollection:nil];
+            _lastIndexPathRow=indexPath.row;
+            _lastIndexPathSection=indexPath.section;
             break;
         case 1:
             temCount=0;
@@ -180,13 +271,16 @@
                 }
                 temCount++;
             }
+            _lastIndexPathRow=indexPath.row;
+            _lastIndexPathSection=indexPath.section;
             [self.navigationController pushViewController:_vcPhotoList animated:YES];
+            [self try];
             break;
         case 2:
-            NSLog(@"选择的是私密相册:%@",[_docList objectAtIndex:indexPath.row]);
             pathPrivateAlbum=[NSString stringWithFormat:@"%@/%@", _pathDocuments,[_docList objectAtIndex:indexPath.row]];
             _privatePhoList=[[NSFileManager defaultManager] contentsOfDirectoryAtPath:pathPrivateAlbum error:nil];
             [_vcPriPhotoList receiveAlbumName:[_docList objectAtIndex:indexPath.row] andArray:_privatePhoList];
+            _lastIndexPathRow=indexPath.row;
             [self.navigationController pushViewController:_vcPriPhotoList animated:YES];
         default:
             break;
@@ -277,7 +371,7 @@
     }];
     return isExisted;
 }
--(void)reloadAlbumInfo{         //目前只调用了一次
+-(void)reloadAlbumInfo{
     _selfDefineAssets = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];  //再获取一次，以便更新selDefineAssets的数量
     
     [_tableView reloadData];        //刷新tableview
@@ -351,7 +445,28 @@
     [self presentViewController:alertController animated:YES completion:nil];
 
 }
-
+#pragma mark - refresh
+-(void)reFreshPrivateTableView{
+    NSString *pathPrivateAlbum=[NSString stringWithFormat:@"%@/%@", _pathDocuments,[_docList objectAtIndex:_lastIndexPathRow]];
+    _privatePhoList=[[NSFileManager defaultManager] contentsOfDirectoryAtPath:pathPrivateAlbum error:nil];
+    [_vcPriPhotoList receiveAlbumName:[_docList objectAtIndex:_lastIndexPathRow] andArray:_privatePhoList];
+}
+-(void)reFreshPublicTableView{
+    if (_lastIndexPathSection==0) {
+        [_vcPhotoList updateFetchRes];
+        [_vcPhotoList setNowAssetCollection:nil];
+    }else{
+        int temCount=0;
+        for (PHAssetCollection *assetCollection in _selfDefineAssets) {
+            if(temCount==_lastIndexPathRow)
+            {
+                [_vcPhotoList updateFetchRes:assetCollection];
+                [_vcPhotoList setNowAssetCollection:assetCollection];
+            }
+            temCount++;
+        }
+    }
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -364,4 +479,8 @@
 -(void)viewWillDisappear:(BOOL)animated{
     [self.navigationController.view bringSubviewToFront:self.navigationController.navigationBar];
 }
+-(void)btnTem{
+    NSLog(@"%@",_tableView);
+}
+
 @end

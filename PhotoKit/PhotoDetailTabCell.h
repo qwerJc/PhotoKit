@@ -8,9 +8,7 @@
 
 #import <UIKit/UIKit.h>
 @protocol CellPhoto <NSObject>
-
 -(void)showPhoto:(NSInteger)order;
-
 @end
 
 @interface PhotoDetailTabCell : UITableViewCell
@@ -31,5 +29,16 @@
 @property(strong,nonatomic)UIImage *miniImageMid;
 @property(strong,nonatomic)UIImage *miniImageRight;
 
+@property(strong,nonatomic)UIImageView *imgVSelL;
+@property(strong,nonatomic)UIImageView *imgVSelM;
+@property(strong,nonatomic)UIImageView *imgVSelR;
+
 @property(weak,nonatomic)id<CellPhoto> delegate;
+
+-(void)setSelectL;
+-(void)cancelSelectL;
+-(void)setSelectM;
+-(void)cancelSelectM;
+-(void)setSelectR;
+-(void)cancelSelectR;
 @end

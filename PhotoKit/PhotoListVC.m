@@ -13,25 +13,39 @@
 
 @interface PhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 {
-    CGRect rect;
     PHAsset *asset;                         //照片库中的一个资源
     CGSize SomeSize;
-    UITableView *tableViewPhoto;
     
     UIImageView *img1;
 
 }
+
+@property(assign,nonatomic)CGRect rect;
+@property(strong,nonatomic)UITableView *tableViewPhoto;
 @property(strong,nonatomic)PHCachingImageManager *imageManager;
 @property(strong,nonatomic)PHFetchResult *assetsFetchResults;
 @property(strong,nonatomic)PHFetchOptions *options;
 @property(strong,nonatomic)UIImagePickerController *imgPicker;
 
-
+@property(assign,nonatomic)BOOL canDel;
+@property(strong,nonatomic)UIView *viewTabBar;
+@property(strong,nonatomic)NSMutableArray* cellSelectState;
 
 @end
 
 @implementation PhotoListVC
+-(id)init{
+    self=[super init];
+    _rect=[[UIScreen mainScreen] bounds];
+    
+    SomeSize=CGSizeMake(240, 300);
 
+    self.tabBarController.tabBar.hidden=YES;
+    
+    _cellSelectState=[[NSMutableArray alloc] init];
+    
+    return self;
+}
 - (void)viewDidLoad {
     [self.view setBackgroundColor:[UIColor grayColor]];
     
@@ -44,40 +58,118 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    rect=[[UIScreen mainScreen] bounds];
-
-    SomeSize=CGSizeMake(240, 300);
     
-    UIView *viewTopBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, rect.size.width, 70)];
+    UIView *viewTopBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _rect.size.width, 70)];
     viewTopBar.backgroundColor=[UIColor orangeColor];
     [self.view addSubview:viewTopBar];
     
-    UIButton *btnCamera = [[UIButton alloc] initWithFrame:CGRectMake(rect.size.width-180, 30, 50, 30)];
+    UIButton *btnCamera = [[UIButton alloc] initWithFrame:CGRectMake(_rect.size.width-180, 30, 50, 30)];
     [btnCamera setTitle:@"相机" forState:UIControlStateNormal];
     [btnCamera addTarget:self action:@selector(btnCameraClick) forControlEvents:UIControlEventTouchUpInside];
     [btnCamera setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [btnCamera setBackgroundColor:[UIColor redColor]];
     [viewTopBar addSubview:btnCamera];
     
+    UIButton *btnChoose = [[UIButton alloc] initWithFrame:CGRectMake(_rect.size.width-290, 30, 70, 30)];
+    [btnChoose setTitle:@"Choose" forState:UIControlStateNormal];
+    [btnChoose addTarget:self action:@selector(btnChooseClick) forControlEvents:UIControlEventTouchUpInside];
+    [btnChoose setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [btnChoose setBackgroundColor:[UIColor redColor]];
+    [viewTopBar addSubview:btnChoose];
+    
     //height_start:65
-    tableViewPhoto=[[UITableView alloc] initWithFrame:CGRectMake(0,70, rect.size.width, rect.size.height-70) style:UITableViewStyleGrouped];
-    tableViewPhoto.dataSource = self;
-    tableViewPhoto.delegate = self;
-    tableViewPhoto.separatorStyle = UITableViewCellSeparatorStyleNone;
-    [self.view addSubview:tableViewPhoto];
+    _tableViewPhoto=[[UITableView alloc] initWithFrame:CGRectMake(0,70, _rect.size.width, _rect.size.height-70) style:UITableViewStyleGrouped];
+    _tableViewPhoto.dataSource = self;
+    _tableViewPhoto.delegate = self;
+    _tableViewPhoto.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.view addSubview:_tableViewPhoto];
+    
+    _viewTabBar = [[UIView alloc] initWithFrame:CGRectMake(0, _rect.size.height-60, _rect.size.width, 60)];
+    [_viewTabBar setHidden:YES];
+    [_viewTabBar setBackgroundColor:[UIColor lightGrayColor]];
+    [self.view addSubview:_viewTabBar];
+    
+    UIButton *btnTabBarDel = [[UIButton alloc] initWithFrame:CGRectMake(_viewTabBar.frame.size.width-90,10, 80, 40)];
+    [btnTabBarDel setTitle:@"del" forState:UIControlStateNormal];
+    [btnTabBarDel addTarget:self action:@selector(btnTabBarDelClick) forControlEvents:UIControlEventTouchUpInside];
+    [btnTabBarDel setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [btnTabBarDel setBackgroundColor:[UIColor redColor]];
+    [_viewTabBar addSubview:btnTabBarDel];
+    
+    UIButton *btnTabBarMove = [[UIButton alloc] initWithFrame:CGRectMake(10,10, 80, 40)];
+    [btnTabBarMove setTitle:@"AddTo" forState:UIControlStateNormal];
+    [btnTabBarMove addTarget:self action:@selector(btnTabBarAddToClick) forControlEvents:UIControlEventTouchUpInside];
+    [btnTabBarMove setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [btnTabBarMove setBackgroundColor:[UIColor redColor]];
+    [_viewTabBar addSubview:btnTabBarMove];
     
     //监听拍照事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraNotification:) name:AVCaptureSessionDidStartRunningNotification object:nil];
 }
 -(void)updateFetchRes:(PHAssetCollection *)assetCollection{
     _assetsFetchResults=[PHAsset fetchAssetsInAssetCollection:assetCollection options:_options];
-
-    [tableViewPhoto reloadData];
+    [_tableViewPhoto reloadData];
 }
 -(void)updateFetchRes{
     _assetsFetchResults= [PHAsset fetchAssetsWithOptions:_options];
-    [tableViewPhoto reloadData];
+    [_tableViewPhoto reloadData];
 }
+
+#pragma mark - Btn Methods
+-(void)btnTabBarAddToClick{
+    NSLog(@"%@",_cellSelectState);
+}
+-(void)btnChooseClick{
+    if(_canDel){
+        _canDel=false;
+        [_viewTabBar setHidden:YES];
+    }else{
+        _canDel=true;
+        [_viewTabBar setHidden:NO];
+    }
+}
+-(void)btnTabBarDelClick{
+    NSMutableArray *delAssets = [[NSMutableArray alloc] init];
+    for (int i=0;i<_cellSelectState.count;i++) {
+        if ([_cellSelectState[i] isEqual:@"1"]){
+            PHAsset *temAsset = [_assetsFetchResults objectAtIndex:i];
+            [delAssets addObject:temAsset];
+        }
+    }
+
+    [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+        [PHAssetChangeRequest deleteAssets:delAssets];
+
+    } completionHandler:^(BOOL success, NSError *error) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"删除成功"
+                                                                                 message:nil
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *OKAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+            [self clearAllState];
+            [self reFreshTableView];
+        }];
+        [alertController addAction:OKAction];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+
+    }];
+
+    
+    
+//    if (_assetsFetchResults) {
+//        PHAsset *asset1 = [_assetsFetchResults objectAtIndex:1];
+//        if (asset1) {
+//            NSMutableArray *delAssets = [[NSMutableArray alloc] initWithObjects:asset1,asset,nil];
+//            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+//                [PHAssetChangeRequest deleteAssets:delAssets];
+//            } completionHandler:^(BOOL success, NSError *error) {
+//            NSLog(@"Error: %@", error);
+//        }];
+//        }
+//    }
+    
+}
+
 -(void)btnCameraClick{
     _imgPicker=[[UIImagePickerController alloc] init];
     
@@ -114,7 +206,7 @@
 - (void)btnCancelCamera{
     [self dismissViewControllerAnimated:YES completion:nil];
     
-    [tableViewPhoto reloadData];
+    [_tableViewPhoto reloadData];
 }
 //拍照后跳转到下面 imagePickerController
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
@@ -162,23 +254,34 @@
     if(order<0){
         return;
     }
+    NSIndexPath *indexPath=[NSIndexPath indexPathForRow:order/3 inSection:0];
 
-    PHImageRequestOptions *tryOp=[[PHImageRequestOptions alloc] init];
-    tryOp.deliveryMode=PHImageRequestOptionsDeliveryModeFastFormat;
-    tryOp.resizeMode=PHImageRequestOptionsResizeModeFast;
-    
-    SinglePhotoVC *sPhotoVC=[[SinglePhotoVC alloc] init];
-    [self.navigationController pushViewController:sPhotoVC animated:YES];
-    
-    asset = _assetsFetchResults[order];
-    
-    [_imageManager requestImageForAsset:asset
-                             targetSize:PHImageManagerMaximumSize
-                            contentMode:PHImageContentModeAspectFill
-                                options:tryOp
-                          resultHandler:^(UIImage *result, NSDictionary *info) {
-                              [sPhotoVC calSize:result];
-                          }];
+    if(_canDel){
+        if([_cellSelectState[order] isEqual:@"0"]){
+            [_cellSelectState replaceObjectAtIndex:order withObject:@"1"];
+        }else{
+            [_cellSelectState replaceObjectAtIndex:order withObject:@"0"];
+        }
+        [_tableViewPhoto reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationNone];
+    }else{
+        PHImageRequestOptions *tryOp=[[PHImageRequestOptions alloc] init];
+        tryOp.deliveryMode=PHImageRequestOptionsDeliveryModeFastFormat;
+        tryOp.resizeMode=PHImageRequestOptionsResizeModeFast;
+        
+        SinglePhotoVC *sPhotoVC=[[SinglePhotoVC alloc] init];
+        [self.navigationController pushViewController:sPhotoVC animated:YES];
+        
+        asset = _assetsFetchResults[order];
+        
+        [_imageManager requestImageForAsset:asset
+                                 targetSize:PHImageManagerMaximumSize
+                                contentMode:PHImageContentModeAspectFill
+                                    options:tryOp
+                              resultHandler:^(UIImage *result, NSDictionary *info) {
+                                  [sPhotoVC calSize:result];
+                              }];
+
+    }
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -194,8 +297,6 @@
     }else{
         return _assetsFetchResults.count/3+1;
     }
-
-
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -244,6 +345,7 @@
     [cell setMiniImageMid:nil];
     [cell setMiniImageRight:nil];
     
+    
     if(indexPath.row*3<_assetsFetchResults.count)
     {
         asset = _assetsFetchResults[indexPath.row*3];
@@ -256,6 +358,12 @@
                                     }];
         [cell setIntOriImageLeft:indexPath.row*3];
         
+        if([_cellSelectState[indexPath.row*3] isEqual:@"1"]){
+            [cell setSelectL];
+        }else{
+            [cell cancelSelectL];
+        }
+
     }
 
     if(indexPath.row*3+1<_assetsFetchResults.count)
@@ -269,6 +377,12 @@
                                         [cell setMiniImageMid:result];
                                 }];
         [cell setIntOriImageMid:indexPath.row*3+1];
+        
+        if([_cellSelectState[indexPath.row*3+1] isEqual:@"1"]){
+            [cell setSelectM];
+        }else{
+            [cell cancelSelectM];
+        }
     }
     
     if(indexPath.row*3+2<_assetsFetchResults.count)
@@ -283,6 +397,11 @@
                                 }];
         [cell setIntOriImageRight:indexPath.row*3+2];
         
+        if([_cellSelectState[indexPath.row*3+2] isEqual:@"1"]){
+            [cell setSelectR];
+        }else{
+            [cell cancelSelectR];
+        }
     }
     
 }
@@ -367,7 +486,21 @@
     return newImage;
     
 }
-
+-(void)reFreshTableView{
+    if([_delegate respondsToSelector:@selector(reFreshPublicTableView)]){
+        [_delegate reFreshPublicTableView]; //在listVC中第一次初始化view时赋值
+    }
+    
+    [_tableViewPhoto reloadData];
+}
+-(void)clearAllState{
+    _canDel=false;
+    [_viewTabBar setHidden:YES];
+    [_cellSelectState removeAllObjects];
+    for (int i=0; i<[_assetsFetchResults count]; i++) {
+        [_cellSelectState addObject:@"0"];
+    }
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -375,10 +508,17 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [self.navigationController.view sendSubviewToBack:self.navigationController.navigationBar];
+    for (int i=0; i<[_assetsFetchResults count]; i++) {
+        [_cellSelectState addObject:@"0"];
+    }
+
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
     [self.navigationController.view bringSubviewToFront:self.navigationController.navigationBar];
+    [_cellSelectState removeAllObjects];
+    
+    [self clearAllState];
 }
 
 @end

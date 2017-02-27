@@ -16,8 +16,8 @@
 }
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    
     if (self) {
-        
         UITapGestureRecognizer *singleTap1 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(singleTapAction:)];//点击手势
         [singleTap1 setNumberOfTouchesRequired:1];
         singleTap1.delegate=self;
@@ -52,27 +52,46 @@
         [imgVPhoto3 addGestureRecognizer:singleTap3];
         [self.contentView addSubview:imgVPhoto3];
         
+        UIImage *imgSel=[UIImage imageNamed:@"Img_Sel"];
+        
+        _imgVSelL=[[UIImageView alloc] initWithFrame:CGRectMake(59,79, 20, 20)];
+        [_imgVSelL setImage:imgSel];
+        [_imgVSelL setHidden:YES];
+        _imgVSelM=[[UIImageView alloc] initWithFrame:CGRectMake(59,79, 20, 20)];
+        [_imgVSelM setImage:imgSel];
+        [_imgVSelM setHidden:YES];
+        _imgVSelR=[[UIImageView alloc] initWithFrame:CGRectMake(59,79, 20, 20)];
+        [_imgVSelR setImage:imgSel];
+        [_imgVSelR setHidden:YES];
+        
+        [imgVPhoto1 addSubview:_imgVSelL];
+        [imgVPhoto2 addSubview:_imgVSelM];
+        [imgVPhoto3 addSubview:_imgVSelR];
+        
     }
+
     return self;
-}
--(void)setPhoto1:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage{
-//    _miniImageLefttt=oriImage;
-
-}
--(void)setPhoto2:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage{
-    imgVPhoto2.image=thumbnail;
-}
--(void)setPhoto3:(UIImage *)thumbnail andOriginImage:(UIImage*)oriImage{
-
 }
 -(void)setMiniImageLeft:(UIImage *)miniImageLeft{
     imgVPhoto1.image=miniImageLeft;
+    if(imgVPhoto1.image==nil){
+        [imgVPhoto1 setAlpha:1];
+        [_imgVSelL setHidden:YES];
+    }
 }
 -(void)setMiniImageMid:(UIImage *)miniImageMid{
     imgVPhoto2.image=miniImageMid;
+    if(imgVPhoto2.image==nil){
+        [imgVPhoto2 setAlpha:1];
+        [_imgVSelM setHidden:YES];
+    }
 }
 -(void)setMiniImageRight:(UIImage *)miniImageRight{
     imgVPhoto3.image=miniImageRight;
+    if(imgVPhoto3.image==nil){
+        [imgVPhoto3 setAlpha:1];
+        [_imgVSelR setHidden:YES];
+    }
 }
 -(void)singleTapAction:(UIGestureRecognizer *)gest
 {
@@ -80,7 +99,7 @@
         case 1:
             NSLog(@"点了图片1");
             if([_delegate respondsToSelector:@selector(showPhoto:)]){
-                [_delegate showPhoto:_intOriImageLeft];
+                [_delegate showPhoto:_intOriImageLeft]; //在listVC中第一次初始化view时赋值
             }
             break;
         case 2:
@@ -99,6 +118,32 @@
             break;
     }
 }
+
+-(void)setSelectL{
+    [imgVPhoto1 setAlpha:0.5];
+    [_imgVSelL setHidden:NO];
+}
+-(void)cancelSelectL{
+    [imgVPhoto1 setAlpha:1];
+    [_imgVSelL setHidden:YES];
+}
+-(void)setSelectM{
+    [imgVPhoto2 setAlpha:0.5];
+    [_imgVSelM setHidden:NO];
+}
+-(void)cancelSelectM{
+    [imgVPhoto2 setAlpha:1];
+    [_imgVSelM setHidden:YES];
+}
+-(void)setSelectR{
+    [imgVPhoto3 setAlpha:0.5];
+    [_imgVSelR setHidden:NO];
+}
+-(void)cancelSelectR{
+    [imgVPhoto3 setAlpha:1];
+    [_imgVSelR setHidden:YES];
+}
+
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];

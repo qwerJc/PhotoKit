@@ -8,9 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #include <Photos/Photos.h>
+@protocol PublicPhotoViewCollector <NSObject>
+-(void)reFreshPublicTableView;
+@end
 
 @interface PhotoListVC : UIViewController
 @property(strong,nonatomic)PHAssetCollection *nowAssetCollection;
 -(void)updateFetchRes:(PHAssetCollection *)assetCollection;
 -(void)updateFetchRes;
+-(void)receive:(UITableView*)tableView;
+
+@property(weak,nonatomic)id<PublicPhotoViewCollector> delegate;
 @end
