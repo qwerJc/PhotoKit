@@ -9,17 +9,16 @@
 #import "PhotoDetailTabCell.h"
 #import "SinglePhotoVC.h"
 #import "PhotoListVC.h"
+#import "JCModel.h"
 
 
 @interface PhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 {
     PHAsset *asset;                         //照片库中的一个资源
     CGSize SomeSize;
-    
-    UIImageView *img1;
 
 }
-
+@property(strong,nonatomic)UIImageView *img1;
 @property(assign,nonatomic)CGRect rect;
 @property(strong,nonatomic)UITableView *tableViewPhoto;
 @property(strong,nonatomic)PHCachingImageManager *imageManager;
@@ -30,6 +29,9 @@
 @property(assign,nonatomic)BOOL canDel;
 @property(strong,nonatomic)UIView *viewTabBar;
 @property(strong,nonatomic)NSMutableArray* cellSelectState;
+@property(strong,nonatomic)JCModel* jcModel;
+@property(strong,nonatomic)UIView *viewAlbumList;
+
 
 @end
 
@@ -43,6 +45,8 @@
     self.tabBarController.tabBar.hidden=YES;
     
     _cellSelectState=[[NSMutableArray alloc] init];
+    
+
     
     return self;
 }
@@ -98,10 +102,15 @@
     
     UIButton *btnTabBarMove = [[UIButton alloc] initWithFrame:CGRectMake(10,10, 80, 40)];
     [btnTabBarMove setTitle:@"AddTo" forState:UIControlStateNormal];
-    [btnTabBarMove addTarget:self action:@selector(btnTabBarAddToClick) forControlEvents:UIControlEventTouchUpInside];
+    [btnTabBarMove addTarget:self action:@selector(btnTabBarAddToClick:) forControlEvents:UIControlEventTouchUpInside];
     [btnTabBarMove setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [btnTabBarMove setBackgroundColor:[UIColor redColor]];
     [_viewTabBar addSubview:btnTabBarMove];
+    
+    _viewAlbumList = [[UIButton alloc] initWithFrame:CGRectMake(10, 10, 10, 10)];
+    [_viewAlbumList setBackgroundColor:[UIColor whiteColor]];
+    [_viewAlbumList.layer setCornerRadius:10];
+    [self.view addSubview:_viewAlbumList];
     
     //监听拍照事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraNotification:) name:AVCaptureSessionDidStartRunningNotification object:nil];
@@ -116,8 +125,67 @@
 }
 
 #pragma mark - Btn Methods
--(void)btnTabBarAddToClick{
-    NSLog(@"%@",_cellSelectState);
+-(void)btnTabBarAddToClick:(UIButton*)btn{
+    [_viewAlbumList setHidden:NO];
+    [_viewAlbumList setFrame:CGRectMake(btn.frame.origin.x-5, _viewTabBar.frame.origin.y+btn.frame.origin.y-[_jcModel getAllAmount]*33-6, btn.frame.size.width*2, [_jcModel getAllAmount]*33+6)];
+    CGFloat btnItemW=_viewAlbumList.frame.size.width-2;
+    CGFloat btnItemH=30;
+
+    for (int i=0; i<[_jcModel getAllAmount]; i++) {
+        CGFloat btnOriginX =1;
+        CGFloat btnOriginY =3+i*33;
+        UIButton *btnItem = [[UIButton alloc] initWithFrame:CGRectMake(btnOriginX, btnOriginY, btnItemW, btnItemH)];
+        btnItem.tag=i;
+        [btnItem setBackgroundColor:[UIColor redColor]];
+        [btnItem setAlpha:0.9];
+        [btnItem setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+        [btnItem setTitle:[_jcModel getAllAlbumName][i] forState:UIControlStateNormal];
+        [btnItem.layer setCornerRadius:5];
+        [btnItem addTarget:self action:@selector(handleAddToAlbum:) forControlEvents:UIControlEventTouchUpInside];
+        [_viewAlbumList addSubview:btnItem];
+    }
+}
+-(void)handleAddToAlbum:(UIButton*)btn{
+    NSString *strBtnName = btn.titleLabel.text;
+    int intRes = [_jcModel getSelWhich:strBtnName];
+    NSLog(@"%d",intRes);
+//    NSLog(@"%@",_cellSelectState);
+    
+    //1，2先不实现，因为会
+    switch (intRes) {
+        case 1:
+            
+            break;
+        case 2:
+            [self saveInSelfAlbum:[_jcModel getSelSelfAlbumOrd:strBtnName]];
+            break;
+        case 3:
+            
+            break;
+        default:
+            break;
+    }
+    [_viewAlbumList setHidden:YES];
+    [_viewAlbumList.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];//清除子view
+}
+-(void)saveInSelfAlbum:(int)ord{
+    PHFetchResult *selfDefineAssets = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+    PHCollection *collection=nil;
+    for (int i=0; i<selfDefineAssets.count; i++) {
+        if(i==ord){
+            collection = selfDefineAssets[i];
+        }
+    }
+    for (int i=0; i<_assetsFetchResults.count; i++) {
+        if([_cellSelectState[i] isEqual:@"1"]){
+            PHAsset *temAsset = [_assetsFetchResults objectAtIndex:i];
+            [self savePhoToSelectAlbum:temAsset andAlbumCollection:(PHAssetCollection *)collection];
+        }
+    }
+    //此时collection已经为目标collection
+//    NSLog(@"%@",collection.localizedTitle);
+    
+    
 }
 -(void)btnChooseClick{
     if(_canDel){
@@ -154,19 +222,6 @@
 
     }];
 
-    
-    
-//    if (_assetsFetchResults) {
-//        PHAsset *asset1 = [_assetsFetchResults objectAtIndex:1];
-//        if (asset1) {
-//            NSMutableArray *delAssets = [[NSMutableArray alloc] initWithObjects:asset1,asset,nil];
-//            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-//                [PHAssetChangeRequest deleteAssets:delAssets];
-//            } completionHandler:^(BOOL success, NSError *error) {
-//            NSLog(@"Error: %@", error);
-//        }];
-//        }
-//    }
     
 }
 
@@ -212,7 +267,6 @@
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
     UIImage *image = info[UIImagePickerControllerOriginalImage];
     
-//    UIImageWriteToSavedPhotosAlbum(image, self, nil, (__bridge void *)self);
     NSError *error = nil;
     __block NSString *createdAssetID = nil;
     [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
@@ -232,6 +286,17 @@
     [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
         //--告诉系统，要操作哪个相册
         PHAssetCollectionChangeRequest *collectionChangeRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:_nowAssetCollection];
+        //--添加图片到自定义相册--追加--就不能成为封面了
+        //--[collectionChangeRequest addAssets:assets];
+        //--插入图片到自定义相册--插入--可以成为封面
+        [collectionChangeRequest insertAssets:temAsset atIndexes:[NSIndexSet indexSetWithIndex:0]];
+    } error:&error];
+}
+-(void)savePhoToSelectAlbum:(PHFetchResult<PHAsset *> *)temAsset andAlbumCollection:(PHAssetCollection*)collection{
+    NSError *error = nil;
+    [[PHPhotoLibrary sharedPhotoLibrary] performChangesAndWait:^{
+        //--告诉系统，要操作哪个相册
+        PHAssetCollectionChangeRequest *collectionChangeRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
         //--添加图片到自定义相册--追加--就不能成为封面了
         //--[collectionChangeRequest addAssets:assets];
         //--插入图片到自定义相册--插入--可以成为封面
@@ -345,7 +410,6 @@
     [cell setMiniImageMid:nil];
     [cell setMiniImageRight:nil];
     
-    
     if(indexPath.row*3<_assetsFetchResults.count)
     {
         asset = _assetsFetchResults[indexPath.row*3];
@@ -363,7 +427,6 @@
         }else{
             [cell cancelSelectL];
         }
-
     }
 
     if(indexPath.row*3+1<_assetsFetchResults.count)
@@ -520,5 +583,8 @@
     
     [self clearAllState];
 }
-
+-(void)receiveJCModel:(JCModel *)jcModel{
+    _jcModel=jcModel;
+    [_jcModel show];
+}
 @end

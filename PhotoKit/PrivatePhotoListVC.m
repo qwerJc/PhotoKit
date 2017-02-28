@@ -337,7 +337,6 @@
 }
 #pragma mark - Take Photo Btn
 -(void)btnTabBarDelClick{
-
     NSFileManager* fileManager=[NSFileManager defaultManager];
     
     for (id key in _delPath) {

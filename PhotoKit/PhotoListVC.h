@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #include <Photos/Photos.h>
+#import "JCModel.h"
 @protocol PublicPhotoViewCollector <NSObject>
 -(void)reFreshPublicTableView;
 @end
@@ -16,7 +17,7 @@
 @property(strong,nonatomic)PHAssetCollection *nowAssetCollection;
 -(void)updateFetchRes:(PHAssetCollection *)assetCollection;
 -(void)updateFetchRes;
--(void)receive:(UITableView*)tableView;
+-(void)receiveJCModel:(JCModel *)jcModel;
 
 @property(weak,nonatomic)id<PublicPhotoViewCollector> delegate;
 @end

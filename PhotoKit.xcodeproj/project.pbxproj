@@ -14,6 +14,7 @@
 		32054A4F1E518ECD007CEDE5 /* AFURLResponseSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 32054A481E518ECD007CEDE5 /* AFURLResponseSerialization.m */; };
 		32054A501E518ECD007CEDE5 /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 32054A4A1E518ECD007CEDE5 /* AFURLSessionManager.m */; };
 		32158D821E2CAC5F00EE0CDD /* PrivatePhotoListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 32158D811E2CAC5F00EE0CDD /* PrivatePhotoListVC.m */; };
+		322DCFFC1E64296C0048498E /* JCModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 322DCFFB1E64296C0048498E /* JCModel.m */; };
 		32F29BAC1E0CC53200290A1E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BAB1E0CC53200290A1E /* main.m */; };
 		32F29BAF1E0CC53200290A1E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BAE1E0CC53200290A1E /* AppDelegate.m */; };
 		32F29BB21E0CC53200290A1E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BB11E0CC53200290A1E /* ViewController.m */; };
@@ -41,6 +42,8 @@
 		32054A4A1E518ECD007CEDE5 /* AFURLSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLSessionManager.m; sourceTree = "<group>"; };
 		32158D801E2CAC5F00EE0CDD /* PrivatePhotoListVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrivatePhotoListVC.h; sourceTree = "<group>"; };
 		32158D811E2CAC5F00EE0CDD /* PrivatePhotoListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivatePhotoListVC.m; sourceTree = "<group>"; };
+		322DCFFA1E64296C0048498E /* JCModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JCModel.h; sourceTree = "<group>"; };
+		322DCFFB1E64296C0048498E /* JCModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JCModel.m; sourceTree = "<group>"; };
 		32F29BA71E0CC53200290A1E /* PhotoKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		32F29BAB1E0CC53200290A1E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32F29BAD1E0CC53200290A1E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -121,6 +124,8 @@
 				32F29BAE1E0CC53200290A1E /* AppDelegate.m */,
 				32F29BB01E0CC53200290A1E /* ViewController.h */,
 				32F29BB11E0CC53200290A1E /* ViewController.m */,
+				322DCFFA1E64296C0048498E /* JCModel.h */,
+				322DCFFB1E64296C0048498E /* JCModel.m */,
 				32FBBBB31E1CE63700A4D6DC /* Cell */,
 				32054A3C1E518E72007CEDE5 /* Network */,
 				32F29BB31E0CC53200290A1E /* Main.storyboard */,
@@ -235,6 +240,7 @@
 				32FBBBB21E1CE38500A4D6DC /* PhotoDetailTabCell.m in Sources */,
 				32054A4D1E518ECD007CEDE5 /* AFSecurityPolicy.m in Sources */,
 				32054A4E1E518ECD007CEDE5 /* AFURLRequestSerialization.m in Sources */,
+				322DCFFC1E64296C0048498E /* JCModel.m in Sources */,
 				32F29BAC1E0CC53200290A1E /* main.m in Sources */,
 				32FBBBAF1E1CDFDA00A4D6DC /* PhotoListVC.m in Sources */,
 				32054A4F1E518ECD007CEDE5 /* AFURLResponseSerialization.m in Sources */,

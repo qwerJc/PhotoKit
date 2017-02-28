@@ -12,6 +12,8 @@
 //  qbimagepicker 批量管理照片
 //  改3 : 设置sel状态时，不刷新cell
 
+//  疑惑：移动照片到自定义相册的时候，其实只是系统相册的映射，因此从自定义相册移动并无意义
+
 //  php相册路径 ：／home／wwwroot／default
 //  删除相册 rm －r 私1
 
@@ -19,6 +21,7 @@
 #import "PhotoListVC.h"
 #import "PrivatePhotoListVC.h"
 #include <Photos/Photos.h>
+#import "JCModel.h"
 
 @interface ViewController ()<PrivatePhotoViewCollector,PublicPhotoViewCollector,UITableViewDelegate,UITableViewDataSource>
 
@@ -35,6 +38,8 @@
 @property(assign,nonatomic)NSInteger lastIndexPathRow;
 @property(assign,nonatomic)NSInteger lastIndexPathSection;
 
+@property(strong,nonatomic)JCModel *jcModel;
+
 @end
 
 @implementation ViewController
@@ -43,10 +48,13 @@
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor grayColor]];
     
+    
     _vcPhotoList=[[PhotoListVC alloc] init];
     _vcPriPhotoList=[[PrivatePhotoListVC alloc] init];
     _vcPhotoList.delegate=self;
     _vcPriPhotoList.delegate=self;
+    
+    
     
     //自定义相册
     _selfDefineAssets = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
@@ -196,6 +204,10 @@
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if(_jcModel==nil){
+        _jcModel=[[JCModel alloc] init];
+    }
+    
     static NSString *CIdentifier = @"CellIdentifier";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CIdentifier];
     
@@ -204,6 +216,10 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle   reuseIdentifier:CIdentifier];
     }
+    [_jcModel setStrSysAlbum:@"相机胶卷"];
+    [_jcModel setFetchResSysSelfAlbum:_selfDefineAssets];
+    [_jcModel setArrayPrivateAlbum:_docList];
+    
     NSString *str;
     NSString *pathPrivateAlbum;
     PHCollection *temCollection;
@@ -222,8 +238,6 @@
             temAssetCollection = (PHAssetCollection *)temCollection;
             PHFetchResult *temFetchResult = [PHAsset fetchAssetsInAssetCollection:temAssetCollection options:nil];
             str = [NSString stringWithFormat:@"%lu",(unsigned long)temFetchResult.count];
-            
-            
             cell.detailTextLabel.text=str;
             cell.textLabel.text=temCollection.localizedTitle;
             break;
@@ -259,6 +273,8 @@
             [_vcPhotoList setNowAssetCollection:nil];
             _lastIndexPathRow=indexPath.row;
             _lastIndexPathSection=indexPath.section;
+            [_jcModel setIsSysAlbum:true];
+            [_vcPhotoList receiveJCModel:_jcModel];
             break;
         case 1:
             temCount=0;
@@ -266,6 +282,7 @@
                 if(temCount==indexPath.row)
                 {
                     NSLog(@"选择的是: %@",assetCollection.localizedTitle);
+                    [_jcModel setSelectWhichAlbum:temCount];
                     [_vcPhotoList updateFetchRes:assetCollection];
                     [_vcPhotoList setNowAssetCollection:assetCollection];
                 }
@@ -273,8 +290,9 @@
             }
             _lastIndexPathRow=indexPath.row;
             _lastIndexPathSection=indexPath.section;
+            [_jcModel setIsSysAlbum:false];
+            [_vcPhotoList receiveJCModel:_jcModel];
             [self.navigationController pushViewController:_vcPhotoList animated:YES];
-            [self try];
             break;
         case 2:
             pathPrivateAlbum=[NSString stringWithFormat:@"%@/%@", _pathDocuments,[_docList objectAtIndex:indexPath.row]];
@@ -480,7 +498,7 @@
     [self.navigationController.view bringSubviewToFront:self.navigationController.navigationBar];
 }
 -(void)btnTem{
-    NSLog(@"%@",_tableView);
+    [_jcModel show];
 }
 
 @end
