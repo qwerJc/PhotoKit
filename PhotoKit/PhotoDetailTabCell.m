@@ -70,6 +70,7 @@
         
     }
 
+
     return self;
 }
 -(void)setMiniImageLeft:(UIImage *)miniImageLeft{
@@ -92,14 +93,18 @@
         [imgVPhoto3 setAlpha:1];
         [_imgVSelR setHidden:YES];
     }
+
 }
+
 -(void)singleTapAction:(UIGestureRecognizer *)gest
 {
     switch (gest.view.tag) {
         case 1:
             NSLog(@"点了图片1");
             if([_delegate respondsToSelector:@selector(showPhoto:)]){
+
                 [_delegate showPhoto:_intOriImageLeft]; //在listVC中第一次初始化view时赋值
+
             }
             break;
         case 2:

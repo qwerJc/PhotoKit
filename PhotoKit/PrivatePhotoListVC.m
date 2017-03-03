@@ -11,7 +11,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import "AFNetworking.h"
 
-#define LAN @"192.168.80.146"
+#define LAN @"192.168.253.21"
 
 @interface PrivatePhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 
@@ -20,6 +20,7 @@
 @property(strong,nonatomic)NSString* nameOfAlbum;
 @property(strong,nonatomic)NSArray* arrayOfAlbum;
 @property(strong,nonatomic)UITableView* tableview;
+@property(strong,nonatomic)SinglePhotoVC *sPhotoVC;
 @property(strong,nonatomic)NSString* photoPath;
 @property(strong,nonatomic)NSString* fullPath;
 @property(strong,nonatomic)UIImagePickerController *imgPicker;
@@ -458,6 +459,7 @@
     return img;
 }
 
+
 //点击图片时调用
 -(void)showPhoto:(NSInteger)order{
     if(order<0){
@@ -545,20 +547,22 @@
 
 //给每个cell赋图片
 -(void)addPhoto:(PhotoDetailTabCell *)cell andIndxPath:(NSIndexPath *)indexPath{
+
+    /*
+    [cell setPhoto1:nil andOriginImage:nil];
+    [cell setPhoto2:nil andOriginImage:nil];
+    [cell setPhoto3:nil andOriginImage:nil];
+    */
     
-    [cell setIntOriImageLeft:-1];
-    [cell setIntOriImageMid:-1];
-    [cell setIntOriImageRight:-1];
-    
-    [cell setMiniImageLeft:nil];
-    [cell setMiniImageMid:nil];
-    [cell setMiniImageRight:nil];
-    
-    if(indexPath.row*3<_arrayOfAlbum.count){
+    if(indexPath.row*3>=_arrayOfAlbum.count)
+    {
+//        [cell setPhoto1:nil andOriginImage:nil];
+    }else{
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:indexPath.row*3]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
         
+
 //        [cell setMiniImageLeft:[self getThumbnail:temImage targetSize:CGSizeMake(4, 5)]];
         //此处也应该用上面，注释下面的，下面两个同样
         [cell setMiniImageLeft:temImage];
@@ -569,13 +573,17 @@
         }else{
             [cell cancelSelectL];
         }
+
     }
     
-    if(indexPath.row*3+1<_arrayOfAlbum.count)
+    if(indexPath.row*3+1>=_arrayOfAlbum.count)
     {
+//        [cell setPhoto1:nil andOriginImage:nil];
+    }else{
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:(indexPath.row*3+1)]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
+
 //        [cell setMiniImageMid:[self getThumbnail:temImage targetSize:CGSizeMake(4, 5)]];
         [cell setMiniImageMid:temImage];
         [cell setIntOriImageMid:indexPath.row*3+1];
@@ -587,11 +595,14 @@
         }
     }
     
-    if(indexPath.row*3+2<_arrayOfAlbum.count)
+    if(indexPath.row*3+2>=_arrayOfAlbum.count)
     {
+//        [cell setPhoto3:nil andOriginImage:nil];
+    }else{
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:(indexPath.row*3+2)]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
+
 //        [cell setMiniImageRight:[self getThumbnail:temImage targetSize:CGSizeMake(4, 5)]];
         [cell setMiniImageRight:temImage];
         [cell setIntOriImageRight:indexPath.row*3+2];
@@ -601,7 +612,9 @@
         }else{
             [cell cancelSelectR];
         }
+
     }
+    
 }
 
 -(UIImage *)getThumbnail:(UIImage *)sourceImage targetSize:(CGSize)size{

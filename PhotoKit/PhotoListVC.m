@@ -11,8 +11,7 @@
 #import "PhotoListVC.h"
 #import "JCModel.h"
 
-
-@interface PhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+@interface PhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource>
 {
     PHAsset *asset;                         //照片库中的一个资源
     CGSize SomeSize;
@@ -21,16 +20,21 @@
 @property(strong,nonatomic)UIImageView *img1;
 @property(assign,nonatomic)CGRect rect;
 @property(strong,nonatomic)UITableView *tableViewPhoto;
+
 @property(strong,nonatomic)PHCachingImageManager *imageManager;
 @property(strong,nonatomic)PHFetchResult *assetsFetchResults;
 @property(strong,nonatomic)PHFetchOptions *options;
-@property(strong,nonatomic)UIImagePickerController *imgPicker;
+@property(assign,nonatomic)id blockLID;
+@property(assign,nonatomic)id blockMID;
+@property(assign,nonatomic)id blockRID;
 
 @property(assign,nonatomic)BOOL canDel;
 @property(strong,nonatomic)UIView *viewTabBar;
 @property(strong,nonatomic)NSMutableArray* cellSelectState;
 @property(strong,nonatomic)JCModel* jcModel;
 @property(strong,nonatomic)UIView *viewAlbumList;
+
+@property(strong,nonatomic)UIImagePickerController *imgPicker;
 
 
 @end
@@ -82,6 +86,7 @@
     [viewTopBar addSubview:btnChoose];
     
     //height_start:65
+
     _tableViewPhoto=[[UITableView alloc] initWithFrame:CGRectMake(0,70, _rect.size.width, _rect.size.height-70) style:UITableViewStyleGrouped];
     _tableViewPhoto.dataSource = self;
     _tableViewPhoto.delegate = self;
@@ -108,9 +113,11 @@
     [_viewTabBar addSubview:btnTabBarMove];
     
     _viewAlbumList = [[UIButton alloc] initWithFrame:CGRectMake(10, 10, 10, 10)];
-    [_viewAlbumList setBackgroundColor:[UIColor whiteColor]];
-    [_viewAlbumList.layer setCornerRadius:10];
+    [_viewAlbumList setBackgroundColor:[UIColor grayColor]];
+    [_viewAlbumList.layer setCornerRadius:5];
+    [_viewAlbumList setAlpha:0.7];
     [self.view addSubview:_viewAlbumList];
+    [_viewAlbumList setHidden:YES];
     
     //监听拍照事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraNotification:) name:AVCaptureSessionDidStartRunningNotification object:nil];
@@ -127,17 +134,16 @@
 #pragma mark - Btn Methods
 -(void)btnTabBarAddToClick:(UIButton*)btn{
     [_viewAlbumList setHidden:NO];
-    [_viewAlbumList setFrame:CGRectMake(btn.frame.origin.x-5, _viewTabBar.frame.origin.y+btn.frame.origin.y-[_jcModel getAllAmount]*33-6, btn.frame.size.width*2, [_jcModel getAllAmount]*33+6)];
-    CGFloat btnItemW=_viewAlbumList.frame.size.width-2;
+    [_viewAlbumList setFrame:CGRectMake(btn.frame.origin.x-5, _viewTabBar.frame.origin.y+btn.frame.origin.y-[_jcModel getAllAmount]*33-6, btn.frame.size.width*2+10, [_jcModel getAllAmount]*33+6)];
+    CGFloat btnItemW=_viewAlbumList.frame.size.width-10;
     CGFloat btnItemH=30;
 
     for (int i=0; i<[_jcModel getAllAmount]; i++) {
-        CGFloat btnOriginX =1;
+        CGFloat btnOriginX =5;
         CGFloat btnOriginY =3+i*33;
         UIButton *btnItem = [[UIButton alloc] initWithFrame:CGRectMake(btnOriginX, btnOriginY, btnItemW, btnItemH)];
         btnItem.tag=i;
-        [btnItem setBackgroundColor:[UIColor redColor]];
-        [btnItem setAlpha:0.9];
+        [btnItem setBackgroundColor:[UIColor lightGrayColor]];
         [btnItem setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
         [btnItem setTitle:[_jcModel getAllAlbumName][i] forState:UIControlStateNormal];
         [btnItem.layer setCornerRadius:5];
@@ -147,46 +153,41 @@
 }
 -(void)handleAddToAlbum:(UIButton*)btn{
     NSString *strBtnName = btn.titleLabel.text;
-    int intRes = [_jcModel getSelWhich:strBtnName];
-    NSLog(@"%d",intRes);
-//    NSLog(@"%@",_cellSelectState);
+    NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     
-    //1，2先不实现，因为会
-    switch (intRes) {
-        case 1:
-            
-            break;
-        case 2:
-            [self saveInSelfAlbum:[_jcModel getSelSelfAlbumOrd:strBtnName]];
-            break;
-        case 3:
-            
-            break;
-        default:
-            break;
-    }
-    [_viewAlbumList setHidden:YES];
-    [_viewAlbumList.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];//清除子view
-}
--(void)saveInSelfAlbum:(int)ord{
-    PHFetchResult *selfDefineAssets = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
-    PHCollection *collection=nil;
-    for (int i=0; i<selfDefineAssets.count; i++) {
-        if(i==ord){
-            collection = selfDefineAssets[i];
-        }
-    }
+    NSDate *currentDate = [NSDate date];//获取当前时间，日期
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"YYYYMMddHHmmss"];
+    NSString *dateString = [dateFormatter stringFromDate:currentDate];
+
+    PHImageRequestOptions *tryOp=[[PHImageRequestOptions alloc] init];
+    tryOp.deliveryMode=PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    tryOp.resizeMode=PHImageRequestOptionsResizeModeExact;
+    
     for (int i=0; i<_assetsFetchResults.count; i++) {
-        if([_cellSelectState[i] isEqual:@"1"]){
-            PHAsset *temAsset = [_assetsFetchResults objectAtIndex:i];
-            [self savePhoToSelectAlbum:temAsset andAlbumCollection:(PHAssetCollection *)collection];
+        if ([_cellSelectState[i] isEqual:@"1"]) {
+            NSLog(@"选中了：%d",i);
+
+            PHAsset *temAsset= _assetsFetchResults[i];
+            [_imageManager requestImageForAsset:temAsset
+                                     targetSize:SomeSize
+                                    contentMode:PHImageContentModeAspectFill
+                                        options:tryOp
+                                  resultHandler:^(UIImage *result, NSDictionary *info) {
+                                      int intTime=[dateString intValue];
+                                      intTime=intTime+i;;
+                                      NSString *resTime=[NSString stringWithFormat:@"%d",intTime];
+                                      
+                                    NSString* nowAlbumPath =[NSString stringWithFormat:@"%@/%@/%@.jpg",docPath,strBtnName,resTime];
+                                      
+                                      [UIImagePNGRepresentation(result)writeToFile:nowAlbumPath    atomically:YES];
+                                  }];
         }
     }
-    //此时collection已经为目标collection
-//    NSLog(@"%@",collection.localizedTitle);
-    
-    
+    [self clearAllState];
+    [_tableViewPhoto reloadData];
 }
+
 -(void)btnChooseClick{
     if(_canDel){
         _canDel=false;
@@ -226,6 +227,7 @@
 }
 
 -(void)btnCameraClick{
+
     _imgPicker=[[UIImagePickerController alloc] init];
     
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
@@ -347,6 +349,7 @@
                               }];
 
     }
+
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -402,24 +405,24 @@
     tryOp.deliveryMode=PHImageRequestOptionsDeliveryModeHighQualityFormat;
     tryOp.resizeMode=PHImageRequestOptionsResizeModeExact;
     
-    [cell setIntOriImageLeft:-1];
-    [cell setIntOriImageMid:-1];
-    [cell setIntOriImageRight:-1];
+
+    [cell setPhoto1:nil andOriginImage:nil];
+    [cell setPhoto2:nil andOriginImage:nil];
+    [cell setPhoto2:nil andOriginImage:nil];
     
-    [cell setMiniImageLeft:nil];
-    [cell setMiniImageMid:nil];
-    [cell setMiniImageRight:nil];
-    
-    if(indexPath.row*3<_assetsFetchResults.count)
+    if(indexPath.row*3>=_assetsFetchResults.count)
     {
+        [cell setPhoto1:nil andOriginImage:nil];
+    }else{
         asset = _assetsFetchResults[indexPath.row*3];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-                                        [cell setMiniImageLeft:result];
+                                        [cell setPhoto1:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];    // 得到一张 UIImage，展示到界面上
                                     }];
+
         [cell setIntOriImageLeft:indexPath.row*3];
         
         if([_cellSelectState[indexPath.row*3] isEqual:@"1"]){
@@ -429,16 +432,20 @@
         }
     }
 
-    if(indexPath.row*3+1<_assetsFetchResults.count)
+    if(indexPath.row*3+1>=_assetsFetchResults.count)
     {
+        [cell setPhoto2:nil andOriginImage:nil];
+    }else{
         asset = _assetsFetchResults[indexPath.row*3+1];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-                                        [cell setMiniImageMid:result];
+                                    
+                                    [cell setPhoto2:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];
                                 }];
+
         [cell setIntOriImageMid:indexPath.row*3+1];
         
         if([_cellSelectState[indexPath.row*3+1] isEqual:@"1"]){
@@ -446,18 +453,23 @@
         }else{
             [cell cancelSelectM];
         }
+
     }
     
-    if(indexPath.row*3+2<_assetsFetchResults.count)
+    if(indexPath.row*3+2>=_assetsFetchResults.count)
     {
+        [cell setPhoto3:nil andOriginImage:nil];
+    }else{
         asset = _assetsFetchResults[indexPath.row*3+2];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-                                        [cell setMiniImageRight:result];
+
+                                    [cell setPhoto3:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];
                                 }];
+
         [cell setIntOriImageRight:indexPath.row*3+2];
         
         if([_cellSelectState[indexPath.row*3+2] isEqual:@"1"]){
@@ -560,6 +572,8 @@
     _canDel=false;
     [_viewTabBar setHidden:YES];
     [_cellSelectState removeAllObjects];
+    [_viewAlbumList setHidden:YES];
+    [_viewAlbumList.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];//清除子view
     for (int i=0; i<[_assetsFetchResults count]; i++) {
         [_cellSelectState addObject:@"0"];
     }

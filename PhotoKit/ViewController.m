@@ -12,10 +12,22 @@
 //  qbimagepicker 批量管理照片
 //  改3 : 设置sel状态时，不刷新cell
 
-//  疑惑：移动照片到自定义相册的时候，其实只是系统相册的映射，因此从自定义相册移动并无意义
+//  移动照片时有的会移动不过去
 
 //  php相册路径 ：／home／wwwroot／default
 //  删除相册 rm －r 私1
+
+//  同步所有
+//  增删改查 － 类似版本管理的策略
+
+//  改进1:能不能把低质量的换为缩略图，高质量的换为高清图
+//  改进2:首页改为半模态视图&
+        //    NSIndexPath *start = [NSIndexPath indexPathForRow:0 inSection:0];
+        //    [self tableView:tableView didSelectRowAtIndexPath:start];
+//  改进3：目前创建完相册cell并不能刷新，要重进才可以
+
+//  进度：准备添加：新建私密相册的功能（弹出半模态视图），以及每个相册加个照相按钮（先显示该相册路径）
+
 
 #import "ViewController.h"
 #import "PhotoListVC.h"
@@ -83,13 +95,6 @@
     [btnCreSelfAlbum setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [btnCreSelfAlbum setBackgroundColor:[UIColor orangeColor]];
     [self.view addSubview:btnCreSelfAlbum];
-    
-    UIButton *tem = [[UIButton alloc] initWithFrame:CGRectMake(180, btnCreSelfAlbum.frame.origin.y+80, 120, 50)];
-    [tem addTarget:self action:@selector(btnTem) forControlEvents:UIControlEventTouchUpInside];
-    [tem setTitle:@"tem" forState:UIControlStateNormal];
-    [tem setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [tem setBackgroundColor:[UIColor orangeColor]];
-    [self.view addSubview:tem];
     
 }
 #pragma mark - tableView
@@ -270,11 +275,13 @@
             NSLog(@"选择的是：相机胶卷");
             [_vcPhotoList updateFetchRes];
             [self.navigationController pushViewController:_vcPhotoList animated:YES];
-            [_vcPhotoList setNowAssetCollection:nil];
+
+//            [_vcPhotoList setNowAssetCollection:nil];
             _lastIndexPathRow=indexPath.row;
             _lastIndexPathSection=indexPath.section;
             [_jcModel setIsSysAlbum:true];
             [_vcPhotoList receiveJCModel:_jcModel];
+
             break;
         case 1:
             temCount=0;
@@ -284,7 +291,6 @@
                     NSLog(@"选择的是: %@",assetCollection.localizedTitle);
                     [_jcModel setSelectWhichAlbum:temCount];
                     [_vcPhotoList updateFetchRes:assetCollection];
-                    [_vcPhotoList setNowAssetCollection:assetCollection];
                 }
                 temCount++;
             }
@@ -472,14 +478,14 @@
 -(void)reFreshPublicTableView{
     if (_lastIndexPathSection==0) {
         [_vcPhotoList updateFetchRes];
-        [_vcPhotoList setNowAssetCollection:nil];
+//        [_vcPhotoList setNowAssetCollection:nil];
     }else{
         int temCount=0;
         for (PHAssetCollection *assetCollection in _selfDefineAssets) {
             if(temCount==_lastIndexPathRow)
             {
                 [_vcPhotoList updateFetchRes:assetCollection];
-                [_vcPhotoList setNowAssetCollection:assetCollection];
+//                [_vcPhotoList setNowAssetCollection:assetCollection];
             }
             temCount++;
         }
@@ -496,9 +502,6 @@
 
 -(void)viewWillDisappear:(BOOL)animated{
     [self.navigationController.view bringSubviewToFront:self.navigationController.navigationBar];
-}
--(void)btnTem{
-    [_jcModel show];
 }
 
 @end

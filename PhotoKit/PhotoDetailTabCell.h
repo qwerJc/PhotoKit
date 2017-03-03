@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 @protocol CellPhoto <NSObject>
 -(void)showPhoto:(NSInteger)order;
+
 @end
 
 @interface PhotoDetailTabCell : UITableViewCell
@@ -21,10 +22,10 @@
     UIControl *conV2;
     UIControl *conV3;
 }
+
 @property(assign,nonatomic)NSInteger intOriImageLeft;
 @property(assign,nonatomic)NSInteger intOriImageRight;
 @property(assign,nonatomic)NSInteger intOriImageMid;
-
 @property(strong,nonatomic)UIImage *miniImageLeft;
 @property(strong,nonatomic)UIImage *miniImageMid;
 @property(strong,nonatomic)UIImage *miniImageRight;

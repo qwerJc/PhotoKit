@@ -35,46 +35,20 @@
     
 }
 -(int)getAllAmount{
-    int temAmount=0;
-    temAmount=temAmount+(int)_arrayPrivateAlbum.count+(int)_fetchResSysSelfAlbum.count;
-    return temAmount;
+    return (int)_arrayPrivateAlbum.count;
 }
 -(NSString*)getSysAlbumName{
     return @"相机胶卷";
 }
 -(NSMutableArray*)getAllAlbumName{
     NSMutableArray *arrayTem=[[NSMutableArray alloc] init];
-    if(!_isSysAlbum){
-        [arrayTem addObject:[self getSysAlbumName]];
-    }
-    int i=0;
-    for(PHAssetCollection *assetCollection in _fetchResSysSelfAlbum) {
-        if(!_isSysAlbum){
-            if (i!=[self getSelectWhichAlbum]) {
-                [arrayTem addObject:assetCollection.localizedTitle];
-            }
-        }else{
-            [arrayTem addObject:assetCollection.localizedTitle];
-        }
-        i++;
-    }
     for (int i=0; i<_arrayPrivateAlbum.count; i++) {
         [arrayTem addObject:_arrayPrivateAlbum[i]];
     }
     return arrayTem;
 }
 
--(int)getSelWhich:(NSString*)name{
-    if([_strSysAlbum isEqualToString:name]){
-        return 1;
-    }else if([self isBelongSelfAlbum:name]){
-        return 2;
-    }else if ([self isBelongPrivateAlbum:name]){
-        return 3;
-    }else{
-        return -1;
-    }
-}
+
 -(int)getSelSelfAlbumOrd:(NSString*)name{
     int i=0;
     for(PHAssetCollection *assetCollection in _fetchResSysSelfAlbum) {
@@ -85,14 +59,7 @@
     }
     return -1;
 }
--(BOOL)isBelongSelfAlbum:(NSString*)name{
-    for(PHAssetCollection *assetCollection in _fetchResSysSelfAlbum) {
-        if ([name isEqualToString:assetCollection.localizedTitle]) {
-            return true;
-        }
-    }
-    return false;
-}
+
 -(BOOL)isBelongPrivateAlbum:(NSString*)name{
     for (int i=0; i<_arrayPrivateAlbum.count; i++) {
         if ([name isEqualToString:_arrayPrivateAlbum[i]]) {
