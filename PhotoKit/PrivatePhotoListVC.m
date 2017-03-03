@@ -20,7 +20,7 @@
 @property(strong,nonatomic)NSString* nameOfAlbum;
 @property(strong,nonatomic)NSArray* arrayOfAlbum;
 @property(strong,nonatomic)UITableView* tableview;
-@property(strong,nonatomic)SinglePhotoVC *sPhotoVC;
+
 @property(strong,nonatomic)NSString* photoPath;
 @property(strong,nonatomic)NSString* fullPath;
 @property(strong,nonatomic)UIImagePickerController *imgPicker;
