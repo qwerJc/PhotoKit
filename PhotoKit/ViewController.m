@@ -276,7 +276,7 @@
             [_vcPhotoList updateFetchRes];
             [self.navigationController pushViewController:_vcPhotoList animated:YES];
 
-//            [_vcPhotoList setNowAssetCollection:nil];
+            [_vcPhotoList setNowAssetCollection:nil];
             _lastIndexPathRow=indexPath.row;
             _lastIndexPathSection=indexPath.section;
             [_jcModel setIsSysAlbum:true];
@@ -291,6 +291,7 @@
                     NSLog(@"选择的是: %@",assetCollection.localizedTitle);
                     [_jcModel setSelectWhichAlbum:temCount];
                     [_vcPhotoList updateFetchRes:assetCollection];
+                    [_vcPhotoList setNowAssetCollection:assetCollection];
                 }
                 temCount++;
             }
@@ -478,14 +479,14 @@
 -(void)reFreshPublicTableView{
     if (_lastIndexPathSection==0) {
         [_vcPhotoList updateFetchRes];
-//        [_vcPhotoList setNowAssetCollection:nil];
+        [_vcPhotoList setNowAssetCollection:nil];
     }else{
         int temCount=0;
         for (PHAssetCollection *assetCollection in _selfDefineAssets) {
             if(temCount==_lastIndexPathRow)
             {
                 [_vcPhotoList updateFetchRes:assetCollection];
-//                [_vcPhotoList setNowAssetCollection:assetCollection];
+                [_vcPhotoList setNowAssetCollection:assetCollection];
             }
             temCount++;
         }

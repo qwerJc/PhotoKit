@@ -548,16 +548,16 @@
 //给每个cell赋图片
 -(void)addPhoto:(PhotoDetailTabCell *)cell andIndxPath:(NSIndexPath *)indexPath{
 
-    /*
-    [cell setPhoto1:nil andOriginImage:nil];
-    [cell setPhoto2:nil andOriginImage:nil];
-    [cell setPhoto3:nil andOriginImage:nil];
-    */
+    [cell setIntOriImageLeft:-1];
+    [cell setIntOriImageMid:-1];
+    [cell setIntOriImageRight:-1];
     
-    if(indexPath.row*3>=_arrayOfAlbum.count)
-    {
-//        [cell setPhoto1:nil andOriginImage:nil];
-    }else{
+    [cell setMiniImageLeft:nil];
+    [cell setMiniImageMid:nil];
+    [cell setMiniImageRight:nil];
+    
+    if(indexPath.row*3<_arrayOfAlbum.count){
+
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:indexPath.row*3]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
@@ -573,13 +573,10 @@
         }else{
             [cell cancelSelectL];
         }
-
     }
     
-    if(indexPath.row*3+1>=_arrayOfAlbum.count)
+    if(indexPath.row*3+1<_arrayOfAlbum.count)
     {
-//        [cell setPhoto1:nil andOriginImage:nil];
-    }else{
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:(indexPath.row*3+1)]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
@@ -595,10 +592,8 @@
         }
     }
     
-    if(indexPath.row*3+2>=_arrayOfAlbum.count)
-    {
-//        [cell setPhoto3:nil andOriginImage:nil];
-    }else{
+    if(indexPath.row*3+2<_arrayOfAlbum.count)
+{
         _photoPath=[NSString stringWithFormat:@"/%@/%@",_nameOfAlbum,[_arrayOfAlbum objectAtIndex:(indexPath.row*3+2)]];
         _fullPath=[[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:_photoPath];
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
@@ -612,9 +607,7 @@
         }else{
             [cell cancelSelectR];
         }
-
     }
-    
 }
 
 -(UIImage *)getThumbnail:(UIImage *)sourceImage targetSize:(CGSize)size{

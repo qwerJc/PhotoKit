@@ -14,6 +14,7 @@
 @end
 
 @interface PhotoListVC : UIViewController
+@property(strong,nonatomic)PHAssetCollection *nowAssetCollection;
 -(void)updateFetchRes:(PHAssetCollection *)assetCollection;
 -(void)updateFetchRes;
 -(void)receiveJCModel:(JCModel *)jcModel;

@@ -11,7 +11,8 @@
 #import "PhotoListVC.h"
 #import "JCModel.h"
 
-@interface PhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource>
+
+@interface PhotoListVC ()<CellPhoto,UITableViewDelegate,UITableViewDataSource,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 {
     PHAsset *asset;                         //照片库中的一个资源
     CGSize SomeSize;
@@ -20,10 +21,10 @@
 @property(strong,nonatomic)UIImageView *img1;
 @property(assign,nonatomic)CGRect rect;
 @property(strong,nonatomic)UITableView *tableViewPhoto;
-
 @property(strong,nonatomic)PHCachingImageManager *imageManager;
 @property(strong,nonatomic)PHFetchResult *assetsFetchResults;
 @property(strong,nonatomic)PHFetchOptions *options;
+@property(strong,nonatomic)UIImagePickerController *imgPicker;
 @property(assign,nonatomic)id blockLID;
 @property(assign,nonatomic)id blockMID;
 @property(assign,nonatomic)id blockRID;
@@ -33,8 +34,6 @@
 @property(strong,nonatomic)NSMutableArray* cellSelectState;
 @property(strong,nonatomic)JCModel* jcModel;
 @property(strong,nonatomic)UIView *viewAlbumList;
-
-@property(strong,nonatomic)UIImagePickerController *imgPicker;
 
 
 @end
@@ -405,24 +404,24 @@
     tryOp.deliveryMode=PHImageRequestOptionsDeliveryModeHighQualityFormat;
     tryOp.resizeMode=PHImageRequestOptionsResizeModeExact;
     
-
-    [cell setPhoto1:nil andOriginImage:nil];
-    [cell setPhoto2:nil andOriginImage:nil];
-    [cell setPhoto2:nil andOriginImage:nil];
+    [cell setIntOriImageLeft:-1];
+    [cell setIntOriImageMid:-1];
+    [cell setIntOriImageRight:-1];
     
-    if(indexPath.row*3>=_assetsFetchResults.count)
+    [cell setMiniImageLeft:nil];
+    [cell setMiniImageMid:nil];
+    [cell setMiniImageRight:nil];
+    
+    if(indexPath.row*3<_assetsFetchResults.count)
     {
-        [cell setPhoto1:nil andOriginImage:nil];
-    }else{
         asset = _assetsFetchResults[indexPath.row*3];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-                                        [cell setPhoto1:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];    // 得到一张 UIImage，展示到界面上
+                                        [cell setMiniImageLeft:result];
                                     }];
-
         [cell setIntOriImageLeft:indexPath.row*3];
         
         if([_cellSelectState[indexPath.row*3] isEqual:@"1"]){
@@ -432,20 +431,16 @@
         }
     }
 
-    if(indexPath.row*3+1>=_assetsFetchResults.count)
+    if(indexPath.row*3+1<_assetsFetchResults.count)
     {
-        [cell setPhoto2:nil andOriginImage:nil];
-    }else{
         asset = _assetsFetchResults[indexPath.row*3+1];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-                                    
-                                    [cell setPhoto2:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];
+                                        [cell setMiniImageMid:result];
                                 }];
-
         [cell setIntOriImageMid:indexPath.row*3+1];
         
         if([_cellSelectState[indexPath.row*3+1] isEqual:@"1"]){
@@ -453,23 +448,17 @@
         }else{
             [cell cancelSelectM];
         }
-
     }
     
-    if(indexPath.row*3+2>=_assetsFetchResults.count)
-    {
-        [cell setPhoto3:nil andOriginImage:nil];
-    }else{
+    if(indexPath.row*3+2<_assetsFetchResults.count){
         asset = _assetsFetchResults[indexPath.row*3+2];
         [_imageManager requestImageForAsset:asset
                                        targetSize:SomeSize
                                       contentMode:PHImageContentModeAspectFill
                                           options:tryOp
                                     resultHandler:^(UIImage *result, NSDictionary *info) {
-
-                                    [cell setPhoto3:[self getThumbnail:result targetSize:CGSizeMake(80, 100)] andOriginImage:result];
+                                        [cell setMiniImageRight:result];
                                 }];
-
         [cell setIntOriImageRight:indexPath.row*3+2];
         
         if([_cellSelectState[indexPath.row*3+2] isEqual:@"1"]){
