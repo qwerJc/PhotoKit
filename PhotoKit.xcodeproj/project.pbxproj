@@ -15,13 +15,15 @@
 		32054A501E518ECD007CEDE5 /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 32054A4A1E518ECD007CEDE5 /* AFURLSessionManager.m */; };
 		32158D821E2CAC5F00EE0CDD /* PrivatePhotoListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 32158D811E2CAC5F00EE0CDD /* PrivatePhotoListVC.m */; };
 		322DCFFC1E64296C0048498E /* JCModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 322DCFFB1E64296C0048498E /* JCModel.m */; };
+		3240C9831E70071200D71019 /* CompressImg.m in Sources */ = {isa = PBXBuildFile; fileRef = 3240C9821E70071200D71019 /* CompressImg.m */; };
+		3240C9871E700A3E00D71019 /* SinglePhoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3240C9861E700A3E00D71019 /* SinglePhoView.m */; };
 		32F29BAC1E0CC53200290A1E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BAB1E0CC53200290A1E /* main.m */; };
 		32F29BAF1E0CC53200290A1E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BAE1E0CC53200290A1E /* AppDelegate.m */; };
 		32F29BB21E0CC53200290A1E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F29BB11E0CC53200290A1E /* ViewController.m */; };
 		32F29BB51E0CC53200290A1E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 32F29BB31E0CC53200290A1E /* Main.storyboard */; };
 		32F29BB71E0CC53200290A1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32F29BB61E0CC53200290A1E /* Assets.xcassets */; };
 		32F29BBA1E0CC53200290A1E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 32F29BB81E0CC53200290A1E /* LaunchScreen.storyboard */; };
-		32F819B01E1E492C0089DEE3 /* SinglePhotoVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F819AF1E1E492C0089DEE3 /* SinglePhotoVC.m */; };
+		32F819B01E1E492C0089DEE3 /* SinglePhoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 32F819AF1E1E492C0089DEE3 /* SinglePhoController.m */; };
 		32FBBBAF1E1CDFDA00A4D6DC /* PhotoListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 32FBBBAE1E1CDFDA00A4D6DC /* PhotoListVC.m */; };
 		32FBBBB21E1CE38500A4D6DC /* PhotoDetailTabCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 32FBBBB11E1CE38500A4D6DC /* PhotoDetailTabCell.m */; };
 /* End PBXBuildFile section */
@@ -44,6 +46,10 @@
 		32158D811E2CAC5F00EE0CDD /* PrivatePhotoListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivatePhotoListVC.m; sourceTree = "<group>"; };
 		322DCFFA1E64296C0048498E /* JCModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JCModel.h; sourceTree = "<group>"; };
 		322DCFFB1E64296C0048498E /* JCModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JCModel.m; sourceTree = "<group>"; };
+		3240C9811E70071200D71019 /* CompressImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompressImg.h; sourceTree = "<group>"; };
+		3240C9821E70071200D71019 /* CompressImg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CompressImg.m; sourceTree = "<group>"; };
+		3240C9851E700A3E00D71019 /* SinglePhoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SinglePhoView.h; sourceTree = "<group>"; };
+		3240C9861E700A3E00D71019 /* SinglePhoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SinglePhoView.m; sourceTree = "<group>"; };
 		32F29BA71E0CC53200290A1E /* PhotoKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		32F29BAB1E0CC53200290A1E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32F29BAD1E0CC53200290A1E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -54,8 +60,8 @@
 		32F29BB61E0CC53200290A1E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		32F29BB91E0CC53200290A1E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		32F29BBB1E0CC53200290A1E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		32F819AE1E1E492C0089DEE3 /* SinglePhotoVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SinglePhotoVC.h; sourceTree = "<group>"; };
-		32F819AF1E1E492C0089DEE3 /* SinglePhotoVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SinglePhotoVC.m; sourceTree = "<group>"; };
+		32F819AE1E1E492C0089DEE3 /* SinglePhoController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SinglePhoController.h; sourceTree = "<group>"; };
+		32F819AF1E1E492C0089DEE3 /* SinglePhoController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SinglePhoController.m; sourceTree = "<group>"; };
 		32FBBBAD1E1CDFDA00A4D6DC /* PhotoListVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoListVC.h; sourceTree = "<group>"; };
 		32FBBBAE1E1CDFDA00A4D6DC /* PhotoListVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoListVC.m; sourceTree = "<group>"; };
 		32FBBBB01E1CE38500A4D6DC /* PhotoDetailTabCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoDetailTabCell.h; sourceTree = "<group>"; };
@@ -101,6 +107,26 @@
 			path = AFNetworking;
 			sourceTree = "<group>";
 		};
+		3240C9801E7006FA00D71019 /* tools */ = {
+			isa = PBXGroup;
+			children = (
+				3240C9811E70071200D71019 /* CompressImg.h */,
+				3240C9821E70071200D71019 /* CompressImg.m */,
+			);
+			name = tools;
+			sourceTree = "<group>";
+		};
+		3240C9841E70083000D71019 /* SinglePhoto */ = {
+			isa = PBXGroup;
+			children = (
+				32F819AE1E1E492C0089DEE3 /* SinglePhoController.h */,
+				32F819AF1E1E492C0089DEE3 /* SinglePhoController.m */,
+				3240C9851E700A3E00D71019 /* SinglePhoView.h */,
+				3240C9861E700A3E00D71019 /* SinglePhoView.m */,
+			);
+			name = SinglePhoto;
+			sourceTree = "<group>";
+		};
 		32F29B9E1E0CC53200290A1E = {
 			isa = PBXGroup;
 			children = (
@@ -126,7 +152,8 @@
 				32F29BB11E0CC53200290A1E /* ViewController.m */,
 				322DCFFA1E64296C0048498E /* JCModel.h */,
 				322DCFFB1E64296C0048498E /* JCModel.m */,
-				32FBBBB31E1CE63700A4D6DC /* Cell */,
+				3240C9801E7006FA00D71019 /* tools */,
+				32FBBBB31E1CE63700A4D6DC /* Album */,
 				32054A3C1E518E72007CEDE5 /* Network */,
 				32F29BB31E0CC53200290A1E /* Main.storyboard */,
 				32F29BB61E0CC53200290A1E /* Assets.xcassets */,
@@ -145,7 +172,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		32FBBBB31E1CE63700A4D6DC /* Cell */ = {
+		32FBBBB31E1CE63700A4D6DC /* Album */ = {
 			isa = PBXGroup;
 			children = (
 				32FBBBAD1E1CDFDA00A4D6DC /* PhotoListVC.h */,
@@ -154,10 +181,9 @@
 				32158D811E2CAC5F00EE0CDD /* PrivatePhotoListVC.m */,
 				32FBBBB01E1CE38500A4D6DC /* PhotoDetailTabCell.h */,
 				32FBBBB11E1CE38500A4D6DC /* PhotoDetailTabCell.m */,
-				32F819AE1E1E492C0089DEE3 /* SinglePhotoVC.h */,
-				32F819AF1E1E492C0089DEE3 /* SinglePhotoVC.m */,
+				3240C9841E70083000D71019 /* SinglePhoto */,
 			);
-			name = Cell;
+			name = Album;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -234,16 +260,18 @@
 			files = (
 				32F29BB21E0CC53200290A1E /* ViewController.m in Sources */,
 				32054A4C1E518ECD007CEDE5 /* AFNetworkReachabilityManager.m in Sources */,
-				32F819B01E1E492C0089DEE3 /* SinglePhotoVC.m in Sources */,
+				32F819B01E1E492C0089DEE3 /* SinglePhoController.m in Sources */,
 				32158D821E2CAC5F00EE0CDD /* PrivatePhotoListVC.m in Sources */,
 				32F29BAF1E0CC53200290A1E /* AppDelegate.m in Sources */,
 				32FBBBB21E1CE38500A4D6DC /* PhotoDetailTabCell.m in Sources */,
+				3240C9871E700A3E00D71019 /* SinglePhoView.m in Sources */,
 				32054A4D1E518ECD007CEDE5 /* AFSecurityPolicy.m in Sources */,
 				32054A4E1E518ECD007CEDE5 /* AFURLRequestSerialization.m in Sources */,
 				322DCFFC1E64296C0048498E /* JCModel.m in Sources */,
 				32F29BAC1E0CC53200290A1E /* main.m in Sources */,
 				32FBBBAF1E1CDFDA00A4D6DC /* PhotoListVC.m in Sources */,
 				32054A4F1E518ECD007CEDE5 /* AFURLResponseSerialization.m in Sources */,
+				3240C9831E70071200D71019 /* CompressImg.m in Sources */,
 				32054A501E518ECD007CEDE5 /* AFURLSessionManager.m in Sources */,
 				32054A4B1E518ECD007CEDE5 /* AFHTTPSessionManager.m in Sources */,
 			);

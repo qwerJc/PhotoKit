@@ -7,7 +7,7 @@
 //
 #include <Photos/Photos.h>
 #import "PhotoDetailTabCell.h"
-#import "SinglePhotoVC.h"
+#import "SinglePhoController.h"
 #import "PhotoListVC.h"
 #import "JCModel.h"
 
@@ -330,8 +330,8 @@
         tryOp.deliveryMode=PHImageRequestOptionsDeliveryModeFastFormat;
         tryOp.resizeMode=PHImageRequestOptionsResizeModeFast;
         
-        SinglePhotoVC *sPhotoVC=[[SinglePhotoVC alloc] init];
-        [self.navigationController pushViewController:sPhotoVC animated:YES];
+        SinglePhoController *viewControllerSinglePho=[[SinglePhoController alloc] init];
+        [self.navigationController pushViewController:viewControllerSinglePho animated:YES];
         
         asset = _assetsFetchResults[order];
         
@@ -340,7 +340,7 @@
                                 contentMode:PHImageContentModeAspectFill
                                     options:tryOp
                               resultHandler:^(UIImage *result, NSDictionary *info) {
-                                  [sPhotoVC calSize:result];
+                                  [viewControllerSinglePho show:result];
                               }];
 
     }

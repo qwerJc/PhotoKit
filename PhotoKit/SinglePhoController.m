@@ -6,45 +6,33 @@
 //  Copyright © 2017年 贾辰. All rights reserved.
 //
 
-#import "SinglePhotoVC.h"
+#import "SinglePhoController.h"
+#import "SinglePhoView.h"
 
-@interface SinglePhotoVC ()
-
+@interface SinglePhoController ()
+@property(nonatomic,strong)SinglePhoView *viewSinglePho;
 @end
 
-@implementation SinglePhotoVC
+@implementation SinglePhoController
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self.view setBackgroundColor:[UIColor grayColor]];
+        _viewSinglePho=[[SinglePhoView alloc] initWithFrame:CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.width)];
+        [_viewSinglePho viewInit];
+        [self.view addSubview:_viewSinglePho];
+    }
+    return self;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [self.view setBackgroundColor:[UIColor grayColor]];
 }
--(void)calSize:(UIImage *)img{
-    NSLog(@"calsize : %@",img);
-    
-    _rect=[[UIScreen mainScreen] bounds];
-    float width,height;
-    width=img.size.width;
-    height=img.size.height;
-    
-    float real_height;
-    real_height=_rect.size.width*height/width;
-    
-    if(real_height>_rect.size.height){
-        _imgHeight=_rect.size.height;
-        _imgWidth=_imgHeight*width/height;
-    }else{
-        _imgHeight=real_height;
-        _imgWidth=_rect.size.width;
-    }
-    
-    NSLog(@"%f,%f",_imgWidth,_imgHeight);
-    
-    
-    
-    UIImageView *imgV=[[UIImageView alloc] initWithFrame:CGRectMake(0,([UIScreen mainScreen].bounds.size.height-_imgHeight)/2,_imgWidth, _imgHeight)];
-    imgV.image=img;
-    [self.view addSubview:imgV];
+-(void)show:(UIImage *)img{
+    [_viewSinglePho showImg:img];
 }
 
 - (void)didReceiveMemoryWarning {

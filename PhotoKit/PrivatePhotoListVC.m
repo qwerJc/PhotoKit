@@ -6,10 +6,11 @@
 //  Copyright © 2017年 贾辰. All rights reserved.
 //
 #import "PhotoDetailTabCell.h"
-#import "SinglePhotoVC.h"
+#import "SinglePhoController.h"
 #import "PrivatePhotoListVC.h"
 #import <AVFoundation/AVFoundation.h>
 #import "AFNetworking.h"
+#import "CompressImg.h"
 
 #define LAN @"192.168.253.21"
 
@@ -373,7 +374,7 @@
     NSString* nowAlbumPath =[NSString stringWithFormat:@"%@/%@/%@.jpg",_docPath,_nameOfAlbum,dateString];
     
     
-    [UIImagePNGRepresentation([self getThumbnail:image targetSize:CGSizeMake(80, 100)])writeToFile:nowAlbumPath atomically:YES];
+    [UIImagePNGRepresentation([CompressImg getThumbnail:image targetSize:CGSizeMake(80, 100)])writeToFile:nowAlbumPath atomically:YES];
     //应该用下面的存原图，上面的存缩略图
 //    [UIImagePNGRepresentation(image)writeToFile:nowAlbumPath    atomically:YES];
     [_tableview reloadData];
@@ -487,11 +488,15 @@
         
         [_tableview reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationNone];
     }else{
-        SinglePhotoVC *sPhotoVC=[[SinglePhotoVC alloc] init];
-        [self.navigationController pushViewController:sPhotoVC animated:YES];
+        NSLog(@"qwerewr");
+        
+        SinglePhoController *viewControllerSinglePho=[[SinglePhoController alloc] init];
+        [self.navigationController pushViewController:viewControllerSinglePho animated:YES];
 
         UIImage* temImage= [[UIImage alloc] initWithContentsOfFile:_fullPath];
-        [sPhotoVC calSize:temImage];
+        [viewControllerSinglePho show:temImage];
+        
+        
     }
 }
 #pragma mark - UITableview Method
@@ -610,89 +615,6 @@
     }
 }
 
--(UIImage *)getThumbnail:(UIImage *)sourceImage targetSize:(CGSize)size{
-    
-    UIImage *newImage = nil;
-    
-    CGSize imageSize = sourceImage.size;
-    
-    CGFloat width = imageSize.width;
-    
-    CGFloat height = imageSize.height;
-    
-    CGFloat targetWidth = size.width;
-    
-    CGFloat targetHeight = size.height;
-    
-    CGFloat scaleFactor = 0.0;
-    
-    CGFloat scaledWidth = targetWidth;
-    
-    CGFloat scaledHeight = targetHeight;
-    
-    CGPoint thumbnailPoint = CGPointMake(0.0, 0.0);
-    
-    if(CGSizeEqualToSize(imageSize, size) == NO){
-        
-        CGFloat widthFactor = targetWidth / width;
-        
-        CGFloat heightFactor = targetHeight / height;
-        
-        if(widthFactor > heightFactor){
-            
-            scaleFactor = widthFactor;
-            
-        }
-        
-        else{
-            
-            scaleFactor = heightFactor;
-            
-        }
-        
-        scaledWidth = width * scaleFactor;
-        
-        scaledHeight = height * scaleFactor;
-        
-        if(widthFactor > heightFactor){
-            
-            thumbnailPoint.y = (targetHeight - scaledHeight) * 0.5;
-            
-        }else if(widthFactor < heightFactor){
-            
-            thumbnailPoint.x = (targetWidth - scaledWidth) * 0.5;
-            
-        }
-        
-    }
-    
-    UIGraphicsBeginImageContextWithOptions(size, NO, 3.0);
-    
-    CGRect thumbnailRect = CGRectZero;
-    
-    thumbnailRect.origin = thumbnailPoint;
-    
-    thumbnailRect.size.width = scaledWidth;
-    
-    thumbnailRect.size.height = scaledHeight;
-    
-    [sourceImage drawInRect:thumbnailRect];
-    
-    newImage = UIGraphicsGetImageFromCurrentImageContext();
-    
-    if(newImage == nil){
-        
-        NSLog(@"scale image fail");
-        
-    }
-    
-    UIGraphicsEndImageContext();
-    
-    [self showImgLength:sourceImage andAfter:newImage];     //临时监测图片大小
-    
-    return newImage;
-    
-}
 
 //监听拍照通知（设置界面为全屏）
 - (void)cameraNotification:(NSNotification *)notification {
@@ -702,19 +624,7 @@
         float aspectRatio = 4.0/3.0;
         float scale = screenSize.height/screenSize.width * aspectRatio;
         _imgPicker.cameraViewTransform = CGAffineTransformMakeScale(scale, scale);
-        
     });
-}
-
-//未调用
--(void)showImgLength:(UIImage *)img1 andAfter:(UIImage *)img2{
-    
-    NSData *before = UIImageJPEGRepresentation(img1, 1);
-    NSData *after = UIImageJPEGRepresentation(img2, 1);
-    
-    NSLog(@"old: %lu",(unsigned long)[before length]);
-    NSLog(@"new: %lu",(unsigned long)[after length]);
-
 }
 
 -(void)reFreshTableView{
